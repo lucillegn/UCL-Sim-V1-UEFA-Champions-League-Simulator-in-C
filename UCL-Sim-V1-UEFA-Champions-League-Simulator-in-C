@@ -1,0 +1,3376 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <time.h>
+#include <math.h>
+typedef struct
+{
+char isim[50];
+int guc; 
+char ulke[5];
+}takim;
+
+typedef struct
+{
+    takim team;
+    
+}UCL;
+
+int golhesapla(double lambda)
+{
+    double olasilik = (double)rand() / RAND_MAX;
+    double toplam = exp(-lambda);
+
+    int k = 0;
+    double terim = toplam;
+
+    while(olasilik > toplam)
+    {
+        k++;
+
+        terim *= lambda / k;
+        toplam += terim;
+    }
+
+    return k;
+}
+int penalti(takim atan)
+{
+    int secim;
+    int kaleciy;
+
+    printf("\n%s penalti kullaniyor!\n", atan.isim);
+    printf("1 - SOL\n");
+    printf("2 - SAG\n");
+    printf("Nereye vuracaksin: ");
+    scanf("%d", &secim);
+
+    kaleciy = rand() % 2 + 1;
+
+    if(secim == kaleciy)
+    {
+        printf("Kaleci doğru köseye atladi!\n");
+        printf("PENALTI KACTI!\n");
+        return 0;
+    }
+    else
+    {
+        printf("GOOOOOOL!\n");
+        return 1;
+    }
+}
+
+
+int rakippenalti(takim rakip)
+{
+    int secim;
+    int rakipvurus;
+
+    printf("\n%s penalti kullaniyor!\n", rakip.isim);
+    printf("Kaleci nereye atlasin?\n");
+    printf("1 - SOL\n");
+    printf("2 - SAG\n");
+    printf("Secimin: ");
+    scanf("%d", &secim);
+
+    rakipvurus = rand() % 2 + 1;
+
+    if(secim == rakipvurus)
+    {
+        printf("KALECİ KURTARDI!\n");
+        return 0;
+    }
+    else
+    {
+        printf("Rakip GOL atti!\n");
+        return 1;
+    }
+}
+
+
+int penaltiserisi(takim userteam, takim rakip)
+{
+    int userpenalti = 0;
+    int rakippenalti_skor = 0;
+
+    printf("\n\n===== PENALTI SERISI =====\n");
+
+    for(int i = 0; i < 5; i++)
+    {
+        printf("\n--- %d. PENALTI ---\n", i + 1);
+
+        userpenalti += penalti(userteam);
+
+        rakippenalti_skor += rakippenalti(rakip);
+
+        printf("\nPENALTI SKORU: %d - %d\n",
+               userpenalti, rakippenalti_skor);
+    }
+
+    while(userpenalti == rakippenalti_skor)
+    {
+        printf("\n--- SERI PENALTI ---\n");
+
+        userpenalti += penalti(userteam);
+
+        rakippenalti_skor += rakippenalti(rakip);
+
+        printf("\nPENALTI SKORU: %d - %d\n",
+               userpenalti, rakippenalti_skor);
+    }
+
+    if(userpenalti > rakippenalti_skor)
+    {
+        printf("\nPENALTILARLA KAZANDIN!\n");
+        return 1;
+    }
+    else
+    {
+        printf("\nPENALTILARLA ELENDIN!\n");
+        return 0;
+    }
+}
+int tursonucu(takim userteam, takim rakip, int userskor, int rakipskor)
+{
+    if(userskor > rakipskor)
+    {
+        printf("\nTuru gectin!\n");
+        return 1;
+    }
+    else if(userskor == rakipskor)
+    {
+        printf("\nSkorlar esit! Penaltilar...\n");
+
+        if(penaltiserisi(userteam, rakip))
+        {
+            printf("Penaltilarla turu gectin!\n");
+            return 1;
+        }
+        else
+        {
+            printf("Penaltilarla elendin!\n");
+            return 0;
+        }
+    }
+    else
+    {
+        printf("\nElendin!\n");
+        return 0;
+    }
+}
+takim rakipsec(UCL allpot[], int *allpotize, takim userteam)
+{
+    int random;
+    takim rakip;
+
+    do
+    {
+        random = rand() % *allpotize;
+        rakip = allpot[random].team;
+
+    }while(strcmp(userteam.isim, rakip.isim) == 0);
+
+
+    for(int i = random; i < *allpotize - 1; i++)
+    {
+        allpot[i] = allpot[i + 1];
+    }
+
+    (*allpotize)--;
+
+    return rakip;
+}
+
+
+int ikimactur(takim userteam, takim rakip)
+{
+    int userskor1;
+    int rakipskor1;
+    int userskor2;
+    int rakipskor2;
+
+    int devam1;
+    int devam2;
+
+    printf("\n\n================================\n");
+    printf("%s - %s\n", userteam.isim, rakip.isim);
+    printf("================================\n");
+
+
+    printf("\n1. MACI oynamak icin (0) basin: ");
+    scanf("%d", &devam1);
+
+    while(devam1 != 0)
+    {
+        printf("Devam etmek icin 0 basin: ");
+        scanf("%d", &devam1);
+    }
+
+    int userguc1 = userteam.guc + (rand() % 21 - 10);
+    int rakipguc1 = rakip.guc + (rand() % 21 - 10);
+
+    double golbeklentisiuser1 = userguc1 / 35.0;
+    double golbeklentisirakip1 = rakipguc1 / 35.0;
+
+    userskor1 = golhesapla(golbeklentisiuser1);
+    rakipskor1 = golhesapla(golbeklentisirakip1);
+
+    printf("\n1. MAC\n");
+    printf("%s %d - %d %s\n",
+           userteam.isim,
+           userskor1,
+           rakipskor1,
+           rakip.isim);
+
+
+    printf("\n2. MACI oynamak icin (0) basin: ");
+    scanf("%d", &devam2);
+
+    while(devam2 != 0)
+    {
+        printf("Devam etmek icin 0 basin: ");
+        scanf("%d", &devam2);
+    }
+
+    int userguc2 = userteam.guc + (rand() % 21 - 10);
+    int rakipguc2 = rakip.guc + (rand() % 21 - 10);
+
+    double golbeklentisiuser2 = userguc2 / 35.0;
+    double golbeklentisirakip2 = rakipguc2 / 35.0;
+
+    userskor2 = golhesapla(golbeklentisiuser2);
+    rakipskor2 = golhesapla(golbeklentisirakip2);
+
+    printf("\n2. MAC\n");
+    printf("%s %d - %d %s\n",
+           userteam.isim,
+           userskor2,
+           rakipskor2,
+           rakip.isim);
+
+
+    int toplamuser = userskor1 + userskor2;
+    int toplamrakip = rakipskor1 + rakipskor2;
+
+    printf("\n================================\n");
+    printf("TOPLAM SKOR\n");
+    printf("%s %d - %d %s\n",
+           userteam.isim,
+           toplamuser,
+           toplamrakip,
+           rakip.isim);
+    printf("================================\n");
+
+
+    return tursonucu(userteam, rakip, toplamuser, toplamrakip);
+}
+
+takim psg = {"Paris Saint-Germain", 98, "FRA" };
+takim bayern = {"Bayern Munich", 96, "GER"};
+takim realmadrid = {"Real Madrid", 97, "ESP"};
+takim liverpool = {"Liverpool", 94, "ENG"};
+takim inter = {"Inter", 95, "ITA"};
+takim mancity = {"Manchester City", 95, "ENG"};
+takim arsenal = {"Arsenal", 96, "ENG"};
+takim barca = {"Barcelona", 97, "ESP"};
+takim atleticom = {"Atletico Madrid", 93, "ESP"};
+
+takim BVB = {"Borussia Dortmund", 87, "GER"};
+takim roma = {"Roma", 83, "ITA"};
+takim sporting = {"Sporting CP", 82, "POR"};
+takim aston = {"Aston Villa", 85, "ENG"};
+takim porto = {"Porto", 86, "POR"};
+takim manu = {"Manshester United", 86, "ENG"};
+takim clupbrugge = {"Clup Brugge", 84, "BEL"};
+takim realbetis = {"Real Betis", 83, "ESP"};
+takim PSV = {"PSV", 86, "NED"};
+
+takim feyenoord = {"Feyenoord", 76, "NED"};
+takim lille = {"Lille", 78, "FRA"};
+takim bodoglimt = {"Bodo Glimt", 72, "NOR"};
+takim napoli = {"Napoli", 75, "ITA"};
+takim leipzig = {"RB Leipzig", 74, "GER"};
+takim villareal = {"Villareal", 78, "ESP"};
+takim shaktar = {"Shaktar Donetsk", 74, "UKR"};
+takim galatasaray = {"Galatasaray", 74, "TUR"};
+takim fenerbahce = {"Fenerbahce", 80, "TUR"};
+
+takim slaviapraha = {"Slavia Praha", 68, "CZE"};
+takim stuttgart = {"Stuttgart", 70, "GER"};
+takim lask = {"LASK", 63, "AUT"};
+takim como = {"Como", 70, "ITA"};
+takim lens = {"Lens", 65, "FRA"};
+takim sabah = {"Sabah FK", 60, "AZE"};
+takim viking = {"Viking", 64, "NOR"};
+takim bratislava = {"Slovan Bratislava", 64, "SVK"};
+takim aek = {"AEK Athens", 65, "GRE"};
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+int main()
+{
+UCL pot1[9] = {psg, bayern,realmadrid,liverpool,inter,mancity,arsenal,barca,atleticom};
+
+UCL pot2[9] = {BVB, roma, sporting, aston, porto, manu, clupbrugge,realbetis,PSV};
+
+UCL pot3[9] = {feyenoord, lille, bodoglimt,napoli,leipzig,villareal,shaktar,galatasaray,fenerbahce};
+
+UCL pot4[9] = {slaviapraha, stuttgart, lask,como,lens,sabah,viking,bratislava,aek};
+
+UCL allpot[36] = {psg, bayern,realmadrid,liverpool,inter,mancity,arsenal,barca,atleticom,BVB, roma, sporting, aston, porto, manu, clupbrugge,realbetis,PSV,feyenoord, lille, bodoglimt,napoli,leipzig,villareal,shaktar,galatasaray,fenerbahce,slaviapraha, stuttgart, lask,como,lens,sabah,viking,bratislava,aek};
+
+int potsize = sizeof(pot1)/sizeof(pot1[0]);
+int potselect;
+int teamselect;
+int allpotize = sizeof(allpot)/sizeof(allpot[0]);
+takim userteam;
+srand(time(0));
+for(int i = 0; i<potsize;i++)
+{
+    printf("%-25s %-25s %-25s %-25s\n", pot1[i].team.isim, pot2[i].team.isim, pot3[i].team.isim, pot4[i].team.isim);
+}
+printf("hangi torbadan takim secmek istersiniz [1-4]\n");
+printf("torba: ");
+scanf("%d", &potselect);
+
+
+
+
+//***************************************************************************************************************************************************
+//***************************************************************************************************************************************************
+//***************************************************************************************************************************************************
+                                                            // POT 1
+if(potselect == 1)
+{
+    int pot1size = sizeof(pot1)/sizeof(pot1[0]);
+    for(int i = 0; i<potsize;i++)
+    {
+        printf("[%d]%s\n",i+1, pot1[i].team.isim);
+    }
+printf("secmek istediginiz takimin numarasini girin [1-9]\n");
+printf("num: ");
+scanf("%d", &teamselect);
+
+userteam = pot1[teamselect-1].team; // userteam
+
+for(int i = teamselect-1; i<pot1size-1;i++)
+{
+     pot1[i] = pot1[i+1];
+}
+pot1size--;
+//*************************************************************************************
+//POT1.1 RANDOM
+int secilen1;
+int secilen2;
+takim secilenrakip1;
+takim secilenrakip2;
+do
+{
+    secilen1 = rand() % pot1size;
+      secilenrakip1 = pot1[secilen1].team;
+
+}while(strcmp(userteam.ulke, secilenrakip1.ulke) == 0);
+
+for(int i = secilen1; i<pot1size-1;i++)
+{
+    pot1[i] = pot1[i+1];
+}
+pot1size--;
+
+do
+{
+    secilen2 = rand() % pot1size;
+    secilenrakip2 = pot1[secilen2].team;
+}while(strcmp(userteam.ulke, secilenrakip2.ulke) == 0);
+for(int i = secilen2; i<pot1size-1;i++)
+{
+    pot1[i] = pot1[i+1];
+}
+pot1size--;
+
+takim pot1kalanlar[6];
+for(int i = 0; i<6; i++)
+{
+    pot1kalanlar[i] = pot1[i].team;
+}
+//*************************************************************************************
+//  POT1.2 RANDOM
+int pot2size = sizeof(pot2) / sizeof(pot2[0]);
+int secilen3;
+int secilen4;
+takim secilenrakip3;
+takim secilenrakip4;
+do
+{
+    secilen3 = rand() % pot2size;
+      secilenrakip3 = pot2[secilen3].team;
+
+}while(strcmp(userteam.ulke, secilenrakip3.ulke) == 0);
+
+for(int i = secilen3; i<pot2size-1;i++)
+{
+    pot2[i] = pot2[i+1];
+}
+pot2size--;
+
+do
+{
+    secilen4 = rand() % pot2size;
+    secilenrakip4 = pot2[secilen4].team;
+}while(strcmp(userteam.ulke, secilenrakip4.ulke) == 0);
+for(int i = secilen4; i<pot2size-1;i++)
+{
+    pot2[i] = pot2[i+1];
+}
+pot2size--;
+
+takim pot2kalanlar[6];
+for(int i = 0; i<6; i++)
+{
+    pot2kalanlar[i] = pot2[i].team;
+}
+//*************************************************************************************
+//  POT1.3 RANDOM
+int pot3size = sizeof(pot3) / sizeof(pot3[0]);
+int secilen5;
+int secilen6;
+takim secilenrakip5;
+takim secilenrakip6;
+do
+{
+    secilen5 = rand() % pot3size;
+      secilenrakip5 = pot3[secilen5].team;
+
+}while(strcmp(userteam.ulke, secilenrakip5.ulke) == 0);
+
+for(int i = secilen5; i<pot3size-1;i++)
+{
+    pot3[i] = pot3[i+1];
+}
+pot3size--;
+
+do
+{
+    secilen6 = rand() % pot3size;
+    secilenrakip6 = pot3[secilen6].team;
+}while(strcmp(userteam.ulke, secilenrakip6.ulke) == 0);
+for(int i = secilen6; i<pot3size-1;i++)
+{
+    pot3[i] = pot3[i+1];
+}
+pot3size--;
+
+takim pot3kalanlar[6];
+for(int i = 0; i<6; i++)
+{
+    pot3kalanlar[i] = pot3[i].team;
+}
+//*************************************************************************************
+//  POT1.4 RANDOM
+int pot4size = sizeof(pot4) / sizeof(pot4[0]);
+int secilen7;
+int secilen8;
+takim secilenrakip7;
+takim secilenrakip8;
+do
+{
+    secilen7 = rand() % pot4size;
+      secilenrakip7 = pot4[secilen7].team;
+
+}while(strcmp(userteam.ulke, secilenrakip7.ulke) == 0);
+
+for(int i = secilen7; i<pot4size-1;i++)
+{
+    pot4[i] = pot4[i+1];
+}
+pot4size--;
+
+do
+{
+    secilen8 = rand() % pot4size;
+    secilenrakip8 = pot4[secilen8].team;
+}while(strcmp(userteam.ulke, secilenrakip8.ulke) == 0);
+for(int i = secilen8; i<pot4size-1;i++)
+{
+    pot4[i] = pot4[i+1];
+}
+pot4size--;
+
+takim pot4kalanlar[6];
+for(int i = 0; i<6; i++)
+{
+    pot4kalanlar[i] = pot4[i].team;
+}
+//*************************************************************************************
+//  İLK 8 HOME AWAY
+
+takim fikstur[4][2] = 
+{ 
+{secilenrakip1, secilenrakip2},
+{secilenrakip3, secilenrakip4},
+{secilenrakip5, secilenrakip6},
+{secilenrakip7, secilenrakip8},
+};
+printf("\n\ntakiminiz: %s\n", userteam.isim);
+printf("HOME                   AWAY\n");
+for(int i = 0; i<4; i++)
+{
+    printf("%-20s %-20s\n", fikstur[i][1].isim, fikstur[i][0].isim);
+}
+printf("\n");
+//*************************************************************************************
+//  İLK 8 FİKSTÜR
+printf("[1]%s[H]\n[2]%s[A]\n[3]%s[H]\n[4]%s[A]\n[5]%s[H]\n[6]%s[A]\n[7]%s[H]\n[8]%s[A]\n",fikstur[0][1].isim,fikstur[2][0].isim,fikstur[3][1].isim,fikstur[0][0].isim,fikstur[2][1].isim,fikstur[1][0].isim,fikstur[1][1].isim,fikstur[3][0].isim);
+//*************************************************************************************
+//*************************************************************************************
+//*************************************************************************************
+//*************************************************************************************
+// 1.HAFTA MAÇI
+int userskor = 0;
+int rakipskor =0;
+int devam;
+int puan = 0;
+
+printf("\n1.hafta macini oynamak icin (0) basin.");
+scanf("%d", &devam);
+
+int userguc1 = userteam.guc + (rand() % 21 - 10);
+int rakipguc1 = fikstur[0][1].guc + (rand() % 21 - 10);
+double golbeklentisiuser1 =  userguc1 / 35.0;
+double golbeklentisi1 = rakipguc1 / 35.0;
+
+userskor = golhesapla(golbeklentisiuser1);
+rakipskor = golhesapla(golbeklentisi1);
+if(devam == 0)
+{
+    printf("\n\n  -mac sonucu-\n");
+    printf("%s %d %d %s\n",userteam.isim, userskor, rakipskor, fikstur[0][1]);
+}
+if(userskor > rakipskor)
+{
+    printf("tebrikler maci %s kazandi", userteam.isim);
+    puan+=3;
+}
+else if(userskor == rakipskor)
+{
+    printf("mac sonucu berabere\nkazanan yok!");
+    puan++;
+}
+else
+{
+    printf("maci kaybettin!");
+}
+//*************************************************************************************
+//*************************************************************************************
+//*************************************************************************************
+//*************************************************************************************
+// 2.HAFTA MAÇI
+int userskor2 = 0;
+int rakipskor2 =0;
+int devam2;
+
+
+printf("\n\n2.hafta macini oynamak icin (0) basin.");
+scanf("%d", &devam2);
+
+int userguc2 = userteam.guc + (rand() % 21 - 10);
+int rakipguc2 = fikstur[2][0].guc + (rand() % 21 - 10);
+double golbeklentisiuser2 =  userguc2 / 35.0;
+double golbeklentisi2 = rakipguc2 / 35.0;
+
+userskor2 = golhesapla(golbeklentisiuser2);
+rakipskor2 = golhesapla(golbeklentisi2);
+if(devam2 == 0)
+{
+    printf("\n\n  -mac sonucu-\n");
+    printf("%s %d %d %s\n",userteam.isim, userskor2, rakipskor2, fikstur[2][0]);
+}
+if(userskor2 > rakipskor2)
+{
+    printf("tebrikler maci %s kazandi", userteam.isim);
+    puan+=3;
+}
+else if(userskor2 == rakipskor2)
+{
+    printf("mac sonucu berabere\nkazanan yok!");
+    puan++;
+}
+else
+{
+    printf("maci kaybettin!");
+}
+//*************************************************************************************
+//*************************************************************************************
+//*************************************************************************************
+//*************************************************************************************
+// 3.HAFTA MAÇI
+int userskor3 = 0;
+int rakipskor3 =0;
+int devam3;
+
+
+printf("\n\n3.hafta macini oynamak icin (0) basin.");
+scanf("%d", &devam3);
+
+int userguc3 = userteam.guc + (rand() % 21 - 10);
+int rakipguc3 = fikstur[3][1].guc + (rand() % 21 - 10);
+double golbeklentisiuser3 =  userguc3 / 35.0;
+double golbeklentisi3 = rakipguc3 / 35.0;
+
+userskor3 = golhesapla(golbeklentisiuser3);
+rakipskor3 = golhesapla(golbeklentisi3);
+if(devam3 == 0);
+{
+    printf("\n\n  -mac sonucu-\n");
+    printf("%s %d %d %s\n",userteam.isim, userskor3, rakipskor3, fikstur[3][1]);
+}
+if(userskor3 > rakipskor3)
+{
+    printf("tebrikler maci %s kazandi", userteam.isim);
+    puan+=3;
+}
+else if(userskor3 == rakipskor3)
+{
+    printf("mac sonucu berabere\nkazanan yok!");
+    puan++;
+}
+else
+{
+    printf("maci kaybettin!");
+}
+//*************************************************************************************
+//*************************************************************************************
+//*************************************************************************************
+//*************************************************************************************
+// 4.HAFTA MAÇI
+int userskor4 = 0;
+int rakipskor4 =0;
+int devam4;
+
+
+printf("\n\n4.hafta macini oynamak icin (0) basin.");
+scanf("%d", &devam4);
+
+int userguc4 = userteam.guc + (rand() % 21 - 10);
+int rakipguc4 = fikstur[0][0].guc + (rand() % 21 - 10);
+double golbeklentisiuser4 =  userguc4 / 35.0;
+double golbeklentisi4 = rakipguc4 / 35.0;
+
+userskor4 = golhesapla(golbeklentisiuser4);
+rakipskor4 = golhesapla(golbeklentisi4);
+if(devam4 == 0)
+{
+    printf("\n\n  -mac sonucu-\n");
+    printf("%s %d %d %s\n",userteam.isim, userskor4, rakipskor4, fikstur[0][0]);
+}
+if(userskor4 > rakipskor4)
+{
+    printf("tebrikler maci %s kazandi", userteam.isim);
+    puan+=3;
+}
+else if(userskor4 == rakipskor4)
+{
+    printf("mac sonucu berabere\nkazanan yok!");
+    puan++;
+}
+else
+{
+    printf("maci kaybettin!");
+}
+//*************************************************************************************
+//*************************************************************************************
+//*************************************************************************************
+//*************************************************************************************
+// 5.HAFTA MAÇI
+int userskor5 = 0;
+int rakipskor5 =0;
+int devam5;
+
+
+printf("\n\n5.hafta macini oynamak icin (0) basin.");
+scanf("%d", &devam5);
+
+int userguc5 = userteam.guc + (rand() % 21 - 10);
+int rakipguc5 = fikstur[2][1].guc + (rand() % 21 - 10);
+double golbeklentisiuser5 =  userguc5 / 35.0;
+double golbeklentisi5 = rakipguc5 / 35.0;
+
+userskor5 = golhesapla(golbeklentisiuser5);
+rakipskor5 = golhesapla(golbeklentisi5);
+if(devam5 == 0);
+{
+    printf("\n\n  -mac sonucu-\n");
+    printf("%s %d %d %s\n",userteam.isim, userskor5, rakipskor5, fikstur[2][1]);
+}
+if(userskor5 > rakipskor5)
+{
+    printf("tebrikler maci %s kazandi", userteam.isim);
+    puan+=3;
+}
+else if(userskor5 == rakipskor5)
+{
+    printf("mac sonucu berabere\nkazanan yok!");
+    puan++;
+}
+else
+{
+    printf("maci kaybettin!");
+}
+//*************************************************************************************
+//*************************************************************************************
+//*************************************************************************************
+//*************************************************************************************
+// 6.HAFTA MAÇI
+int userskor6 = 0;
+int rakipskor6 =0;
+int devam6;
+
+
+printf("\n\n6.hafta macini oynamak icin (0) basin.");
+scanf("%d", &devam6);
+
+int userguc6 = userteam.guc + (rand() % 21 - 10);
+int rakipguc6 = fikstur[1][0].guc + (rand() % 21 - 10);
+double golbeklentisiuser6 =  userguc6 / 35.0;
+double golbeklentisi6 = rakipguc6 / 35.0;
+
+userskor6 = golhesapla(golbeklentisiuser6);
+rakipskor6 = golhesapla(golbeklentisi6);
+if(devam6 == 0)
+{
+    printf("\n\n  -mac sonucu-\n");
+    printf("%s %d %d %s\n",userteam.isim, userskor6, rakipskor6, fikstur[1][0]);
+}
+if(userskor6 > rakipskor6)
+{
+    printf("tebrikler maci %s kazandi", userteam.isim);
+    puan+=3;
+}
+else if(userskor6 == rakipskor6)
+{
+    printf("mac sonucu berabere\nkazanan yok!");
+    puan++;
+}
+else
+{
+    printf("maci kaybettin!");
+}
+//*************************************************************************************
+//*************************************************************************************
+//*************************************************************************************
+//*************************************************************************************
+// 7.HAFTA MAÇI
+int userskor7 = 0;
+int rakipskor7 =0;
+int devam7;
+
+
+printf("\n\n7.hafta macini oynamak icin (0) basin.");
+scanf("%d", &devam7);
+
+int userguc7 = userteam.guc + (rand() % 21 - 10);
+int rakipguc7 = fikstur[1][1].guc + (rand() % 21 - 10);
+double golbeklentisiuser7 =  userguc7 / 35.0;
+double golbeklentisi7 = rakipguc7 / 35.0;
+
+userskor7 = golhesapla(golbeklentisiuser7);
+rakipskor7 = golhesapla(golbeklentisi7);
+if(devam7 == 0)
+{
+    printf("\n\n  -mac sonucu-\n");
+    printf("%s %d %d %s\n",userteam.isim, userskor7, rakipskor7, fikstur[1][1]);
+}
+if(userskor7 > rakipskor7)
+{
+    printf("tebrikler maci %s kazandi", userteam.isim);
+    puan+=3;
+}
+else if(userskor7 == rakipskor7)
+{
+    printf("mac sonucu berabere\nkazanan yok!");
+    puan++;
+}
+else
+{
+    printf("maci kaybettin!");
+}
+//*************************************************************************************
+//*************************************************************************************
+//*************************************************************************************
+//*************************************************************************************
+// 8.HAFTA MAÇI
+int userskor8 = 0;
+int rakipskor8 =0;
+int devam8;
+
+
+printf("\n\n8.hafta macini oynamak icin (0) basin.");
+scanf("%d", &devam8);
+
+int userguc8 = userteam.guc + (rand() % 21 - 10);
+int rakipguc8 = fikstur[3][0].guc + (rand() % 21 - 10);
+double golbeklentisiuser8 =  userguc8 / 35.0;
+double golbeklentisi8 = rakipguc8 / 35.0;
+
+userskor8 = golhesapla(golbeklentisiuser8);
+rakipskor8 = golhesapla(golbeklentisi8);
+if(devam8 == 0)
+{
+    printf("\n\n  -mac sonucu-\n");
+    printf("%s %d %d %s\n",userteam.isim, userskor8, rakipskor8, fikstur[1][1]);
+}
+if(userskor8 > rakipskor8)
+{
+    printf("tebrikler maci %s kazandi", userteam.isim);
+    puan+=3;
+}
+else if(userskor8 == rakipskor8)
+{
+    printf("mac sonucu berabere\nkazanan yok!");
+    puan++;
+}
+else
+{
+    printf("maci kaybettin!");
+}
+int toplamliggol = userskor + userskor2 + userskor3 + userskor4 + userskor5 + userskor6 + userskor7 + userskor8;
+printf("\npuan durumu: %d\n", puan);
+printf("lig asamasinda atilan gol: %d\n", toplamliggol);
+//*************************************************************************************
+//*************************************************************************************
+//*************************************************************************************
+//*************************************************************************************
+//*************************************************************************************
+//*************************************************************************************
+//*************************************************************************************
+//*************************************************************************************
+// PLAYOFF / SON16
+// PLAYOFF / SON16
+
+
+if(puan < 8)
+{
+    printf("\n\nPLAYOFF'A KALAMADIN.\n");
+    printf("Toplam puanin: %d\n", puan);
+}
+else if(puan >= 8 && puan < 15)
+{
+    printf("\n\n================================\n");
+    printf("PLAYOFF TURU\n");
+    printf("================================\n");
+
+
+    /* PLAYOFF RAKIBI */
+
+    takim playoffrakip;
+
+    playoffrakip = rakipsec(allpot, &allpotize, userteam);
+
+    printf("\nPlayoff rakibin: %s\n", playoffrakip.isim);
+
+
+    /* PLAYOFF */
+
+    if(ikimactur(userteam, playoffrakip))
+    {
+        printf("\nPLAYOFF'U GECTIN!\n");
+
+
+        /* SON 16 */
+
+        printf("\n\n================================\n");
+        printf("SON 16 TURU\n");
+        printf("================================\n");
+
+        takim son16rakip;
+
+        son16rakip = rakipsec(allpot, &allpotize, userteam);
+
+        printf("\nSon 16 rakibin: %s\n", son16rakip.isim);
+
+
+        if(ikimactur(userteam, son16rakip))
+        {
+            printf("\nSON 16 TURUNU GECTIN!\n");
+
+
+            /* CEYREK FINAL */
+
+            printf("\n\n================================\n");
+            printf("CEYREK FINAL\n");
+            printf("================================\n");
+
+            takim ceyrekfinalrakip;
+
+            ceyrekfinalrakip = rakipsec(allpot, &allpotize, userteam);
+
+            printf("\nCeyrek final rakibin: %s\n",
+                   ceyrekfinalrakip.isim);
+
+
+            if(ikimactur(userteam, ceyrekfinalrakip))
+            {
+                printf("\nCEYREK FINAL'I GECTIN!\n");
+
+
+                /* YARI FINAL */
+
+                printf("\n\n================================\n");
+                printf("YARI FINAL\n");
+                printf("================================\n");
+
+                takim yarifinalrakip;
+
+                yarifinalrakip = rakipsec(allpot, &allpotize, userteam);
+
+                printf("\nYari final rakibin: %s\n",
+                       yarifinalrakip.isim);
+
+
+                if(ikimactur(userteam, yarifinalrakip))
+                {
+                    printf("\nYARI FINAL'I GECTIN!\n");
+
+
+                    /* FINAL */
+
+                    printf("\n\n================================\n");
+                    printf("FINAL\n");
+                    printf("================================\n");
+
+                    takim finalrakip;
+
+                    finalrakip = rakipsec(allpot, &allpotize, userteam);
+
+                    printf("\nFinal rakibin: %s\n",
+                           finalrakip.isim);
+
+
+                    /*
+                       FINALDE DE IKI MAC OLSUN DIYORSAN
+                       AYNI FONKSIYONU KULLANIYORUZ
+                    */
+
+                    if(ikimactur(userteam, finalrakip))
+                    {
+                        printf("\n\n================================\n");
+                        printf("ŞAMPİYONSUN!\n");
+                        printf("================================\n");
+                    }
+                    else
+                    {
+                        printf("\n\nFINALDE ELENDIN.\n");
+                    }
+                }
+                else
+                {
+                    printf("\nYARI FINALDE ELENDIN.\n");
+                }
+            }
+            else
+            {
+                printf("\nCEYREK FINALDE ELENDIN.\n");
+            }
+        }
+        else
+        {
+            printf("\nSON 16 TURUNDA ELENDIN.\n");
+        }
+    }
+    else
+    {
+        printf("\nPLAYOFF'TA ELENDIN.\n");
+    }
+}
+else
+{
+    printf("\n\n================================\n");
+    printf("SON 16 TURU\n");
+    printf("================================\n");
+
+
+    takim son16rakip;
+
+    son16rakip = rakipsec(allpot, &allpotize, userteam);
+
+    printf("\nSon 16 rakibin: %s\n", son16rakip.isim);
+
+
+    if(ikimactur(userteam, son16rakip))
+    {
+        printf("\nSON 16 TURUNU GECTIN!\n");
+
+
+        /* CEYREK FINAL */
+
+        takim ceyrekfinalrakip;
+
+        printf("\n\n================================\n");
+        printf("CEYREK FINAL\n");
+        printf("================================\n");
+
+        ceyrekfinalrakip = rakipsec(allpot, &allpotize, userteam);
+
+        printf("\nCeyrek final rakibin: %s\n",
+               ceyrekfinalrakip.isim);
+
+
+        if(ikimactur(userteam, ceyrekfinalrakip))
+        {
+            printf("\nCEYREK FINAL'I GECTIN!\n");
+
+
+            /* YARI FINAL */
+
+            takim yarifinalrakip;
+
+            printf("\n\n================================\n");
+            printf("YARI FINAL\n");
+            printf("================================\n");
+
+            yarifinalrakip = rakipsec(allpot, &allpotize, userteam);
+
+            printf("\nYari final rakibin: %s\n",
+                   yarifinalrakip.isim);
+
+
+            if(ikimactur(userteam, yarifinalrakip))
+            {
+                printf("\nYARI FINAL'I GECTIN!\n");
+
+
+                /* FINAL */
+
+                takim finalrakip;
+
+                printf("\n\n================================\n");
+                printf("FINAL\n");
+                printf("================================\n");
+
+                finalrakip = rakipsec(allpot, &allpotize, userteam);
+
+                printf("\nFinal rakibin: %s\n",
+                       finalrakip.isim);
+
+
+                if(ikimactur(userteam, finalrakip))
+                {
+                    printf("\n\n================================\n");
+                    printf("ŞAMPİYONSUN!\n");
+                    printf("================================\n");
+                }
+                else
+                {
+                    printf("\nFINALDE ELENDIN.\n");
+                }
+            }
+            else
+            {
+                printf("\nYARI FINALDE ELENDIN.\n");
+            }
+        }
+        else
+        {
+            printf("\nCEYREK FINALDE ELENDIN.\n");
+        }
+    }
+    else
+    {
+        printf("\nSON 16 TURUNDA ELENDIN.\n");
+    }
+} 
+
+
+
+
+}else if(potselect == 2)
+{
+    int pot2size = sizeof(pot2)/sizeof(pot2[0]);
+    for(int i = 0; i<potsize;i++)
+    {
+        printf("[%d]%s\n",i+1, pot2[i].team.isim);
+    }
+printf("secmek istediginiz takimin numarasini girin [1-9]\n");
+printf("num: ");
+scanf("%d", &teamselect);
+
+userteam = pot2[teamselect-1].team; // userteam
+
+for(int i = teamselect-1; i<pot2size-1;i++)
+{
+     pot2[i] = pot2[i+1];
+}
+pot2size--;
+//*************************************************************************************
+//POT1.1 RANDOM
+int secilen1;
+int secilen2;
+takim secilenrakip1;
+takim secilenrakip2;
+do
+{
+    secilen1 = rand() % pot2size;
+      secilenrakip1 = pot2[secilen1].team;
+
+}while(strcmp(userteam.ulke, secilenrakip1.ulke) == 0);
+
+for(int i = secilen1; i<pot2size-1;i++)
+{
+    pot2[i] = pot2[i+1];
+}
+pot2size--;
+
+do
+{
+    secilen2 = rand() % pot2size;
+    secilenrakip2 = pot2[secilen2].team;
+}while(strcmp(userteam.ulke, secilenrakip2.ulke) == 0);
+for(int i = secilen2; i<pot2size-1;i++)
+{
+    pot2[i] = pot2[i+1];
+}
+pot2size--;
+
+takim pot2kalanlar[6];
+for(int i = 0; i<6; i++)
+{
+    pot2kalanlar[i] = pot2[i].team;
+}
+//*************************************************************************************
+//  POT1.2 RANDOM
+int pot1size = sizeof(pot1) / sizeof(pot1[0]);
+int secilen3;
+int secilen4;
+takim secilenrakip3;
+takim secilenrakip4;
+do
+{
+    secilen3 = rand() % pot1size;
+      secilenrakip3 = pot1[secilen3].team;
+
+}while(strcmp(userteam.ulke, secilenrakip3.ulke) == 0);
+
+for(int i = secilen3; i<pot1size-1;i++)
+{
+    pot1[i] = pot1[i+1];
+}
+pot1size--;
+
+do
+{
+    secilen4 = rand() % pot1size;
+    secilenrakip4 = pot1[secilen4].team;
+}while(strcmp(userteam.ulke, secilenrakip4.ulke) == 0);
+for(int i = secilen4; i<pot1size-1;i++)
+{
+    pot1[i] = pot1[i+1];
+}
+pot1size--;
+
+takim pot1kalanlar[6];
+for(int i = 0; i<6; i++)
+{
+    pot1kalanlar[i] = pot1[i].team;
+}
+//*************************************************************************************
+//  POT1.3 RANDOM
+int pot3size = sizeof(pot3) / sizeof(pot3[0]);
+int secilen5;
+int secilen6;
+takim secilenrakip5;
+takim secilenrakip6;
+do
+{
+    secilen5 = rand() % pot3size;
+      secilenrakip5 = pot3[secilen5].team;
+
+}while(strcmp(userteam.ulke, secilenrakip5.ulke) == 0);
+
+for(int i = secilen5; i<pot3size-1;i++)
+{
+    pot3[i] = pot3[i+1];
+}
+pot3size--;
+
+do
+{
+    secilen6 = rand() % pot3size;
+    secilenrakip6 = pot3[secilen6].team;
+}while(strcmp(userteam.ulke, secilenrakip6.ulke) == 0);
+for(int i = secilen6; i<pot3size-1;i++)
+{
+    pot3[i] = pot3[i+1];
+}
+pot3size--;
+
+takim pot3kalanlar[6];
+for(int i = 0; i<6; i++)
+{
+    pot3kalanlar[i] = pot3[i].team;
+}
+//*************************************************************************************
+//  POT1.4 RANDOM
+int pot4size = sizeof(pot4) / sizeof(pot4[0]);
+int secilen7;
+int secilen8;
+takim secilenrakip7;
+takim secilenrakip8;
+do
+{
+    secilen7 = rand() % pot4size;
+      secilenrakip7 = pot4[secilen7].team;
+
+}while(strcmp(userteam.ulke, secilenrakip7.ulke) == 0);
+
+for(int i = secilen7; i<pot4size-1;i++)
+{
+    pot4[i] = pot4[i+1];
+}
+pot4size--;
+
+do
+{
+    secilen8 = rand() % pot4size;
+    secilenrakip8 = pot4[secilen8].team;
+}while(strcmp(userteam.ulke, secilenrakip8.ulke) == 0);
+for(int i = secilen8; i<pot4size-1;i++)
+{
+    pot4[i] = pot4[i+1];
+}
+pot4size--;
+
+takim pot4kalanlar[6];
+for(int i = 0; i<6; i++)
+{
+    pot4kalanlar[i] = pot4[i].team;
+}
+//*************************************************************************************
+//  İLK 8 HOME AWAY
+
+takim fikstur[4][2] = 
+{ 
+{secilenrakip1, secilenrakip2},
+{secilenrakip3, secilenrakip4},
+{secilenrakip5, secilenrakip6},
+{secilenrakip7, secilenrakip8},
+};
+printf("\n\ntakiminiz: %s\n", userteam.isim);
+printf("HOME                   AWAY\n");
+for(int i = 0; i<4; i++)
+{
+    printf("%-20s %-20s\n", fikstur[i][1].isim, fikstur[i][0].isim);
+}
+printf("\n");
+//*************************************************************************************
+//  İLK 8 FİKSTÜR
+printf("[1]%s[H]\n[2]%s[A]\n[3]%s[H]\n[4]%s[A]\n[5]%s[H]\n[6]%s[A]\n[7]%s[H]\n[8]%s[A]\n",fikstur[0][1].isim,fikstur[2][0].isim,fikstur[3][1].isim,fikstur[0][0].isim,fikstur[2][1].isim,fikstur[1][0].isim,fikstur[1][1].isim,fikstur[3][0].isim);
+//*************************************************************************************
+//*************************************************************************************
+//*************************************************************************************
+//*************************************************************************************
+// 1.HAFTA MAÇI
+int userskor = 0;
+int rakipskor =0;
+int devam;
+int puan = 0;
+
+printf("\n1.hafta macini oynamak icin (0) basin.");
+scanf("%d", &devam);
+
+int userguc1 = userteam.guc + (rand() % 21 - 10);
+int rakipguc1 = fikstur[0][1].guc + (rand() % 21 - 10);
+double golbeklentisiuser1 =  userguc1 / 35.0;
+double golbeklentisi1 = rakipguc1 / 35.0;
+
+userskor = golhesapla(golbeklentisiuser1);
+rakipskor = golhesapla(golbeklentisi1);
+if(devam == 0)
+{
+    printf("\n\n  -mac sonucu-\n");
+    printf("%s %d %d %s\n",userteam.isim, userskor, rakipskor, fikstur[0][1]);
+}
+if(userskor > rakipskor)
+{
+    printf("tebrikler maci %s kazandi", userteam.isim);
+    puan+=3;
+}
+else if(userskor == rakipskor)
+{
+    printf("mac sonucu berabere\nkazanan yok!");
+    puan++;
+}
+else
+{
+    printf("maci kaybettin!");
+}
+//*************************************************************************************
+//*************************************************************************************
+//*************************************************************************************
+//*************************************************************************************
+// 2.HAFTA MAÇI
+int userskor2 = 0;
+int rakipskor2 =0;
+int devam2;
+
+
+printf("\n\n2.hafta macini oynamak icin (0) basin.");
+scanf("%d", &devam2);
+
+int userguc2 = userteam.guc + (rand() % 21 - 10);
+int rakipguc2 = fikstur[2][0].guc + (rand() % 21 - 10);
+double golbeklentisiuser2 =  userguc2 / 35.0;
+double golbeklentisi2 = rakipguc2 / 35.0;
+
+userskor2 = golhesapla(golbeklentisiuser2);
+rakipskor2 = golhesapla(golbeklentisi2);
+if(devam2 == 0)
+{
+    printf("\n\n  -mac sonucu-\n");
+    printf("%s %d %d %s\n",userteam.isim, userskor2, rakipskor2, fikstur[2][0]);
+}
+if(userskor2 > rakipskor2)
+{
+    printf("tebrikler maci %s kazandi", userteam.isim);
+    puan+=3;
+}
+else if(userskor2 == rakipskor2)
+{
+    printf("mac sonucu berabere\nkazanan yok!");
+    puan++;
+}
+else
+{
+    printf("maci kaybettin!");
+}
+//*************************************************************************************
+//*************************************************************************************
+//*************************************************************************************
+//*************************************************************************************
+// 3.HAFTA MAÇI
+int userskor3 = 0;
+int rakipskor3 =0;
+int devam3;
+
+
+printf("\n\n3.hafta macini oynamak icin (0) basin.");
+scanf("%d", &devam3);
+
+int userguc3 = userteam.guc + (rand() % 21 - 10);
+int rakipguc3 = fikstur[3][1].guc + (rand() % 21 - 10);
+double golbeklentisiuser3 =  userguc3 / 35.0;
+double golbeklentisi3 = rakipguc3 / 35.0;
+
+userskor3 = golhesapla(golbeklentisiuser3);
+rakipskor3 = golhesapla(golbeklentisi3);
+if(devam3 == 0);
+{
+    printf("\n\n  -mac sonucu-\n");
+    printf("%s %d %d %s\n",userteam.isim, userskor3, rakipskor3, fikstur[3][1]);
+}
+if(userskor3 > rakipskor3)
+{
+    printf("tebrikler maci %s kazandi", userteam.isim);
+    puan+=3;
+}
+else if(userskor3 == rakipskor3)
+{
+    printf("mac sonucu berabere\nkazanan yok!");
+    puan++;
+}
+else
+{
+    printf("maci kaybettin!");
+}
+//*************************************************************************************
+//*************************************************************************************
+//*************************************************************************************
+//*************************************************************************************
+// 4.HAFTA MAÇI
+int userskor4 = 0;
+int rakipskor4 =0;
+int devam4;
+
+
+printf("\n\n4.hafta macini oynamak icin (0) basin.");
+scanf("%d", &devam4);
+
+int userguc4 = userteam.guc + (rand() % 21 - 10);
+int rakipguc4 = fikstur[0][0].guc + (rand() % 21 - 10);
+double golbeklentisiuser4 =  userguc4 / 35.0;
+double golbeklentisi4 = rakipguc4 / 35.0;
+
+userskor4 = golhesapla(golbeklentisiuser4);
+rakipskor4 = golhesapla(golbeklentisi4);
+if(devam4 == 0)
+{
+    printf("\n\n  -mac sonucu-\n");
+    printf("%s %d %d %s\n",userteam.isim, userskor4, rakipskor4, fikstur[0][0]);
+}
+if(userskor4 > rakipskor4)
+{
+    printf("tebrikler maci %s kazandi", userteam.isim);
+    puan+=3;
+}
+else if(userskor4 == rakipskor4)
+{
+    printf("mac sonucu berabere\nkazanan yok!");
+    puan++;
+}
+else
+{
+    printf("maci kaybettin!");
+}
+//*************************************************************************************
+//*************************************************************************************
+//*************************************************************************************
+//*************************************************************************************
+// 5.HAFTA MAÇI
+int userskor5 = 0;
+int rakipskor5 =0;
+int devam5;
+
+
+printf("\n\n5.hafta macini oynamak icin (0) basin.");
+scanf("%d", &devam5);
+
+int userguc5 = userteam.guc + (rand() % 21 - 10);
+int rakipguc5 = fikstur[2][1].guc + (rand() % 21 - 10);
+double golbeklentisiuser5 =  userguc5 / 35.0;
+double golbeklentisi5 = rakipguc5 / 35.0;
+
+userskor5 = golhesapla(golbeklentisiuser5);
+rakipskor5 = golhesapla(golbeklentisi5);
+if(devam5 == 0);
+{
+    printf("\n\n  -mac sonucu-\n");
+    printf("%s %d %d %s\n",userteam.isim, userskor5, rakipskor5, fikstur[2][1]);
+}
+if(userskor5 > rakipskor5)
+{
+    printf("tebrikler maci %s kazandi", userteam.isim);
+    puan+=3;
+}
+else if(userskor5 == rakipskor5)
+{
+    printf("mac sonucu berabere\nkazanan yok!");
+    puan++;
+}
+else
+{
+    printf("maci kaybettin!");
+}
+//*************************************************************************************
+//*************************************************************************************
+//*************************************************************************************
+//*************************************************************************************
+// 6.HAFTA MAÇI
+int userskor6 = 0;
+int rakipskor6 =0;
+int devam6;
+
+
+printf("\n\n6.hafta macini oynamak icin (0) basin.");
+scanf("%d", &devam6);
+
+int userguc6 = userteam.guc + (rand() % 21 - 10);
+int rakipguc6 = fikstur[1][0].guc + (rand() % 21 - 10);
+double golbeklentisiuser6 =  userguc6 / 35.0;
+double golbeklentisi6 = rakipguc6 / 35.0;
+
+userskor6 = golhesapla(golbeklentisiuser6);
+rakipskor6 = golhesapla(golbeklentisi6);
+if(devam6 == 0)
+{
+    printf("\n\n  -mac sonucu-\n");
+    printf("%s %d %d %s\n",userteam.isim, userskor6, rakipskor6, fikstur[1][0]);
+}
+if(userskor6 > rakipskor6)
+{
+    printf("tebrikler maci %s kazandi", userteam.isim);
+    puan+=3;
+}
+else if(userskor6 == rakipskor6)
+{
+    printf("mac sonucu berabere\nkazanan yok!");
+    puan++;
+}
+else
+{
+    printf("maci kaybettin!");
+}
+//*************************************************************************************
+//*************************************************************************************
+//*************************************************************************************
+//*************************************************************************************
+// 7.HAFTA MAÇI
+int userskor7 = 0;
+int rakipskor7 =0;
+int devam7;
+
+
+printf("\n\n7.hafta macini oynamak icin (0) basin.");
+scanf("%d", &devam7);
+
+int userguc7 = userteam.guc + (rand() % 21 - 10);
+int rakipguc7 = fikstur[1][1].guc + (rand() % 21 - 10);
+double golbeklentisiuser7 =  userguc7 / 35.0;
+double golbeklentisi7 = rakipguc7 / 35.0;
+
+userskor7 = golhesapla(golbeklentisiuser7);
+rakipskor7 = golhesapla(golbeklentisi7);
+if(devam7 == 0)
+{
+    printf("\n\n  -mac sonucu-\n");
+    printf("%s %d %d %s\n",userteam.isim, userskor7, rakipskor7, fikstur[1][1]);
+}
+if(userskor7 > rakipskor7)
+{
+    printf("tebrikler maci %s kazandi", userteam.isim);
+    puan+=3;
+}
+else if(userskor7 == rakipskor7)
+{
+    printf("mac sonucu berabere\nkazanan yok!");
+    puan++;
+}
+else
+{
+    printf("maci kaybettin!");
+}
+//*************************************************************************************
+//*************************************************************************************
+//*************************************************************************************
+//*************************************************************************************
+// 8.HAFTA MAÇI
+int userskor8 = 0;
+int rakipskor8 =0;
+int devam8;
+
+
+printf("\n\n8.hafta macini oynamak icin (0) basin.");
+scanf("%d", &devam8);
+
+int userguc8 = userteam.guc + (rand() % 21 - 10);
+int rakipguc8 = fikstur[3][0].guc + (rand() % 21 - 10);
+double golbeklentisiuser8 =  userguc8 / 35.0;
+double golbeklentisi8 = rakipguc8 / 35.0;
+
+userskor8 = golhesapla(golbeklentisiuser8);
+rakipskor8 = golhesapla(golbeklentisi8);
+if(devam8 == 0)
+{
+    printf("\n\n  -mac sonucu-\n");
+    printf("%s %d %d %s\n",userteam.isim, userskor8, rakipskor8, fikstur[1][1]);
+}
+if(userskor8 > rakipskor8)
+{
+    printf("tebrikler maci %s kazandi", userteam.isim);
+    puan+=3;
+}
+else if(userskor8 == rakipskor8)
+{
+    printf("mac sonucu berabere\nkazanan yok!");
+    puan++;
+}
+else
+{
+    printf("maci kaybettin!");
+}
+int toplamliggol = userskor + userskor2 + userskor3 + userskor4 + userskor5 + userskor6 + userskor7 + userskor8;
+printf("\npuan durumu: %d\n", puan);
+printf("lig asamasinda atilan gol: %d\n", toplamliggol);
+//*************************************************************************************
+//*************************************************************************************
+//*************************************************************************************
+//*************************************************************************************
+//*************************************************************************************
+//*************************************************************************************
+//*************************************************************************************
+//*************************************************************************************
+// PLAYOFF / SON16
+// PLAYOFF / SON16
+
+
+if(puan < 8)
+{
+    printf("\n\nPLAYOFF'A KALAMADIN.\n");
+    printf("Toplam puanin: %d\n", puan);
+}
+else if(puan >= 8 && puan < 15)
+{
+    printf("\n\n================================\n");
+    printf("PLAYOFF TURU\n");
+    printf("================================\n");
+
+
+    /* PLAYOFF RAKIBI */
+
+    takim playoffrakip;
+
+    playoffrakip = rakipsec(allpot, &allpotize, userteam);
+
+    printf("\nPlayoff rakibin: %s\n", playoffrakip.isim);
+
+
+    /* PLAYOFF */
+
+    if(ikimactur(userteam, playoffrakip))
+    {
+        printf("\nPLAYOFF'U GECTIN!\n");
+
+
+        /* SON 16 */
+
+        printf("\n\n================================\n");
+        printf("SON 16 TURU\n");
+        printf("================================\n");
+
+        takim son16rakip;
+
+        son16rakip = rakipsec(allpot, &allpotize, userteam);
+
+        printf("\nSon 16 rakibin: %s\n", son16rakip.isim);
+
+
+        if(ikimactur(userteam, son16rakip))
+        {
+            printf("\nSON 16 TURUNU GECTIN!\n");
+
+
+            /* CEYREK FINAL */
+
+            printf("\n\n================================\n");
+            printf("CEYREK FINAL\n");
+            printf("================================\n");
+
+            takim ceyrekfinalrakip;
+
+            ceyrekfinalrakip = rakipsec(allpot, &allpotize, userteam);
+
+            printf("\nCeyrek final rakibin: %s\n",
+                   ceyrekfinalrakip.isim);
+
+
+            if(ikimactur(userteam, ceyrekfinalrakip))
+            {
+                printf("\nCEYREK FINAL'I GECTIN!\n");
+
+
+                /* YARI FINAL */
+
+                printf("\n\n================================\n");
+                printf("YARI FINAL\n");
+                printf("================================\n");
+
+                takim yarifinalrakip;
+
+                yarifinalrakip = rakipsec(allpot, &allpotize, userteam);
+
+                printf("\nYari final rakibin: %s\n",
+                       yarifinalrakip.isim);
+
+
+                if(ikimactur(userteam, yarifinalrakip))
+                {
+                    printf("\nYARI FINAL'I GECTIN!\n");
+
+
+                    /* FINAL */
+
+                    printf("\n\n================================\n");
+                    printf("FINAL\n");
+                    printf("================================\n");
+
+                    takim finalrakip;
+
+                    finalrakip = rakipsec(allpot, &allpotize, userteam);
+
+                    printf("\nFinal rakibin: %s\n",
+                           finalrakip.isim);
+
+
+                    /*
+                       FINALDE DE IKI MAC OLSUN DIYORSAN
+                       AYNI FONKSIYONU KULLANIYORUZ
+                    */
+
+                    if(ikimactur(userteam, finalrakip))
+                    {
+                        printf("\n\n================================\n");
+                        printf("ŞAMPİYONSUN!\n");
+                        printf("================================\n");
+                    }
+                    else
+                    {
+                        printf("\n\nFINALDE ELENDIN.\n");
+                    }
+                }
+                else
+                {
+                    printf("\nYARI FINALDE ELENDIN.\n");
+                }
+            }
+            else
+            {
+                printf("\nCEYREK FINALDE ELENDIN.\n");
+            }
+        }
+        else
+        {
+            printf("\nSON 16 TURUNDA ELENDIN.\n");
+        }
+    }
+    else
+    {
+        printf("\nPLAYOFF'TA ELENDIN.\n");
+    }
+}
+else
+{
+    printf("\n\n================================\n");
+    printf("SON 16 TURU\n");
+    printf("================================\n");
+
+
+    takim son16rakip;
+
+    son16rakip = rakipsec(allpot, &allpotize, userteam);
+
+    printf("\nSon 16 rakibin: %s\n", son16rakip.isim);
+
+
+    if(ikimactur(userteam, son16rakip))
+    {
+        printf("\nSON 16 TURUNU GECTIN!\n");
+
+
+        /* CEYREK FINAL */
+
+        takim ceyrekfinalrakip;
+
+        printf("\n\n================================\n");
+        printf("CEYREK FINAL\n");
+        printf("================================\n");
+
+        ceyrekfinalrakip = rakipsec(allpot, &allpotize, userteam);
+
+        printf("\nCeyrek final rakibin: %s\n",
+               ceyrekfinalrakip.isim);
+
+
+        if(ikimactur(userteam, ceyrekfinalrakip))
+        {
+            printf("\nCEYREK FINAL'I GECTIN!\n");
+
+
+            /* YARI FINAL */
+
+            takim yarifinalrakip;
+
+            printf("\n\n================================\n");
+            printf("YARI FINAL\n");
+            printf("================================\n");
+
+            yarifinalrakip = rakipsec(allpot, &allpotize, userteam);
+
+            printf("\nYari final rakibin: %s\n",
+                   yarifinalrakip.isim);
+
+
+            if(ikimactur(userteam, yarifinalrakip))
+            {
+                printf("\nYARI FINAL'I GECTIN!\n");
+
+
+                /* FINAL */
+
+                takim finalrakip;
+
+                printf("\n\n================================\n");
+                printf("FINAL\n");
+                printf("================================\n");
+
+                finalrakip = rakipsec(allpot, &allpotize, userteam);
+
+                printf("\nFinal rakibin: %s\n",
+                       finalrakip.isim);
+
+
+                if(ikimactur(userteam, finalrakip))
+                {
+                    printf("\n\n================================\n");
+                    printf("ŞAMPİYONSUN!\n");
+                    printf("================================\n");
+                }
+                else
+                {
+                    printf("\nFINALDE ELENDIN.\n");
+                }
+            }
+            else
+            {
+                printf("\nYARI FINALDE ELENDIN.\n");
+            }
+        }
+        else
+        {
+            printf("\nCEYREK FINALDE ELENDIN.\n");
+        }
+    }
+    else
+    {
+        printf("\nSON 16 TURUNDA ELENDIN.\n");
+    }
+}
+}else if(potselect == 3)
+{
+    int pot3size = sizeof(pot3)/sizeof(pot3[0]);
+    for(int i = 0; i<potsize;i++)
+    {
+        printf("[%d]%s\n",i+1, pot3[i].team.isim);
+    }
+printf("secmek istediginiz takimin numarasini girin [1-9]\n");
+printf("num: ");
+scanf("%d", &teamselect);
+
+userteam = pot3[teamselect-1].team; // userteam
+
+for(int i = teamselect-1; i<pot3size-1;i++)
+{
+     pot3[i] = pot3[i+1];
+}
+pot3size--;
+//*************************************************************************************
+//POT1.1 RANDOM
+int secilen1;
+int secilen2;
+takim secilenrakip1;
+takim secilenrakip2;
+do
+{
+    secilen1 = rand() % pot3size;
+      secilenrakip1 = pot3[secilen1].team;
+
+}while(strcmp(userteam.ulke, secilenrakip1.ulke) == 0);
+
+for(int i = secilen1; i<pot3size-1;i++)
+{
+    pot3[i] = pot3[i+1];
+}
+pot3size--;
+
+do
+{
+    secilen2 = rand() % pot3size;
+    secilenrakip2 = pot3[secilen2].team;
+}while(strcmp(userteam.ulke, secilenrakip2.ulke) == 0);
+for(int i = secilen2; i<pot3size-1;i++)
+{
+    pot3[i] = pot3[i+1];
+}
+pot3size--;
+
+takim pot3kalanlar[6];
+for(int i = 0; i<6; i++)
+{
+    pot3kalanlar[i] = pot3[i].team;
+}
+//*************************************************************************************
+//  POT1.2 RANDOM
+int pot1size = sizeof(pot1) / sizeof(pot1[0]);
+int secilen3;
+int secilen4;
+takim secilenrakip3;
+takim secilenrakip4;
+do
+{
+    secilen3 = rand() % pot1size;
+      secilenrakip3 = pot1[secilen3].team;
+
+}while(strcmp(userteam.ulke, secilenrakip3.ulke) == 0);
+
+for(int i = secilen3; i<pot1size-1;i++)
+{
+    pot1[i] = pot1[i+1];
+}
+pot1size--;
+
+do
+{
+    secilen4 = rand() % pot1size;
+    secilenrakip4 = pot1[secilen4].team;
+}while(strcmp(userteam.ulke, secilenrakip4.ulke) == 0);
+for(int i = secilen4; i<pot1size-1;i++)
+{
+    pot1[i] = pot1[i+1];
+}
+pot1size--;
+
+takim pot1kalanlar[6];
+for(int i = 0; i<6; i++)
+{
+    pot1kalanlar[i] = pot1[i].team;
+}
+//*************************************************************************************
+//  POT1.3 RANDOM
+int pot2size = sizeof(pot2) / sizeof(pot2[0]);
+int secilen5;
+int secilen6;
+takim secilenrakip5;
+takim secilenrakip6;
+do
+{
+    secilen5 = rand() % pot2size;
+      secilenrakip5 = pot2[secilen5].team;
+
+}while(strcmp(userteam.ulke, secilenrakip5.ulke) == 0);
+
+for(int i = secilen5; i<pot2size-1;i++)
+{
+    pot2[i] = pot2[i+1];
+}
+pot2size--;
+
+do
+{
+    secilen6 = rand() % pot2size;
+    secilenrakip6 = pot2[secilen6].team;
+}while(strcmp(userteam.ulke, secilenrakip6.ulke) == 0);
+for(int i = secilen6; i<pot2size-1;i++)
+{
+    pot2[i] = pot2[i+1];
+}
+pot2size--;
+
+takim pot2kalanlar[6];
+for(int i = 0; i<6; i++)
+{
+    pot2kalanlar[i] = pot2[i].team;
+}
+//*************************************************************************************
+//  POT1.4 RANDOM
+int pot4size = sizeof(pot4) / sizeof(pot4[0]);
+int secilen7;
+int secilen8;
+takim secilenrakip7;
+takim secilenrakip8;
+do
+{
+    secilen7 = rand() % pot4size;
+      secilenrakip7 = pot4[secilen7].team;
+
+}while(strcmp(userteam.ulke, secilenrakip7.ulke) == 0);
+
+for(int i = secilen7; i<pot4size-1;i++)
+{
+    pot4[i] = pot4[i+1];
+}
+pot4size--;
+
+do
+{
+    secilen8 = rand() % pot4size;
+    secilenrakip8 = pot4[secilen8].team;
+}while(strcmp(userteam.ulke, secilenrakip8.ulke) == 0);
+for(int i = secilen8; i<pot4size-1;i++)
+{
+    pot4[i] = pot4[i+1];
+}
+pot4size--;
+
+takim pot4kalanlar[6];
+for(int i = 0; i<6; i++)
+{
+    pot4kalanlar[i] = pot4[i].team;
+}
+//*************************************************************************************
+//  İLK 8 HOME AWAY
+
+takim fikstur[4][2] = 
+{ 
+{secilenrakip1, secilenrakip2},
+{secilenrakip3, secilenrakip4},
+{secilenrakip5, secilenrakip6},
+{secilenrakip7, secilenrakip8},
+};
+printf("\n\ntakiminiz: %s\n", userteam.isim);
+printf("HOME                   AWAY\n");
+for(int i = 0; i<4; i++)
+{
+    printf("%-20s %-20s\n", fikstur[i][1].isim, fikstur[i][0].isim);
+}
+printf("\n");
+//*************************************************************************************
+//  İLK 8 FİKSTÜR
+printf("[1]%s[H]\n[2]%s[A]\n[3]%s[H]\n[4]%s[A]\n[5]%s[H]\n[6]%s[A]\n[7]%s[H]\n[8]%s[A]\n",fikstur[0][1].isim,fikstur[2][0].isim,fikstur[3][1].isim,fikstur[0][0].isim,fikstur[2][1].isim,fikstur[1][0].isim,fikstur[1][1].isim,fikstur[3][0].isim);
+//*************************************************************************************
+//*************************************************************************************
+//*************************************************************************************
+//*************************************************************************************
+// 1.HAFTA MAÇI
+int userskor = 0;
+int rakipskor =0;
+int devam;
+int puan = 0;
+
+printf("\n1.hafta macini oynamak icin (0) basin.");
+scanf("%d", &devam);
+
+int userguc1 = userteam.guc + (rand() % 21 - 10);
+int rakipguc1 = fikstur[0][1].guc + (rand() % 21 - 10);
+double golbeklentisiuser1 =  userguc1 / 35.0;
+double golbeklentisi1 = rakipguc1 / 35.0;
+
+userskor = golhesapla(golbeklentisiuser1);
+rakipskor = golhesapla(golbeklentisi1);
+if(devam == 0)
+{
+    printf("\n\n  -mac sonucu-\n");
+    printf("%s %d %d %s\n",userteam.isim, userskor, rakipskor, fikstur[0][1]);
+}
+if(userskor > rakipskor)
+{
+    printf("tebrikler maci %s kazandi", userteam.isim);
+    puan+=3;
+}
+else if(userskor == rakipskor)
+{
+    printf("mac sonucu berabere\nkazanan yok!");
+    puan++;
+}
+else
+{
+    printf("maci kaybettin!");
+}
+//*************************************************************************************
+//*************************************************************************************
+//*************************************************************************************
+//*************************************************************************************
+// 2.HAFTA MAÇI
+int userskor2 = 0;
+int rakipskor2 =0;
+int devam2;
+
+
+printf("\n\n2.hafta macini oynamak icin (0) basin.");
+scanf("%d", &devam2);
+
+int userguc2 = userteam.guc + (rand() % 21 - 10);
+int rakipguc2 = fikstur[2][0].guc + (rand() % 21 - 10);
+double golbeklentisiuser2 =  userguc2 / 35.0;
+double golbeklentisi2 = rakipguc2 / 35.0;
+
+userskor2 = golhesapla(golbeklentisiuser2);
+rakipskor2 = golhesapla(golbeklentisi2);
+if(devam2 == 0)
+{
+    printf("\n\n  -mac sonucu-\n");
+    printf("%s %d %d %s\n",userteam.isim, userskor2, rakipskor2, fikstur[2][0]);
+}
+if(userskor2 > rakipskor2)
+{
+    printf("tebrikler maci %s kazandi", userteam.isim);
+    puan+=3;
+}
+else if(userskor2 == rakipskor2)
+{
+    printf("mac sonucu berabere\nkazanan yok!");
+    puan++;
+}
+else
+{
+    printf("maci kaybettin!");
+}
+//*************************************************************************************
+//*************************************************************************************
+//*************************************************************************************
+//*************************************************************************************
+// 3.HAFTA MAÇI
+int userskor3 = 0;
+int rakipskor3 =0;
+int devam3;
+
+
+printf("\n\n3.hafta macini oynamak icin (0) basin.");
+scanf("%d", &devam3);
+
+int userguc3 = userteam.guc + (rand() % 21 - 10);
+int rakipguc3 = fikstur[3][1].guc + (rand() % 21 - 10);
+double golbeklentisiuser3 =  userguc3 / 35.0;
+double golbeklentisi3 = rakipguc3 / 35.0;
+
+userskor3 = golhesapla(golbeklentisiuser3);
+rakipskor3 = golhesapla(golbeklentisi3);
+if(devam3 == 0);
+{
+    printf("\n\n  -mac sonucu-\n");
+    printf("%s %d %d %s\n",userteam.isim, userskor3, rakipskor3, fikstur[3][1]);
+}
+if(userskor3 > rakipskor3)
+{
+    printf("tebrikler maci %s kazandi", userteam.isim);
+    puan+=3;
+}
+else if(userskor3 == rakipskor3)
+{
+    printf("mac sonucu berabere\nkazanan yok!");
+    puan++;
+}
+else
+{
+    printf("maci kaybettin!");
+}
+//*************************************************************************************
+//*************************************************************************************
+//*************************************************************************************
+//*************************************************************************************
+// 4.HAFTA MAÇI
+int userskor4 = 0;
+int rakipskor4 =0;
+int devam4;
+
+
+printf("\n\n4.hafta macini oynamak icin (0) basin.");
+scanf("%d", &devam4);
+
+int userguc4 = userteam.guc + (rand() % 21 - 10);
+int rakipguc4 = fikstur[0][0].guc + (rand() % 21 - 10);
+double golbeklentisiuser4 =  userguc4 / 35.0;
+double golbeklentisi4 = rakipguc4 / 35.0;
+
+userskor4 = golhesapla(golbeklentisiuser4);
+rakipskor4 = golhesapla(golbeklentisi4);
+if(devam4 == 0)
+{
+    printf("\n\n  -mac sonucu-\n");
+    printf("%s %d %d %s\n",userteam.isim, userskor4, rakipskor4, fikstur[0][0]);
+}
+if(userskor4 > rakipskor4)
+{
+    printf("tebrikler maci %s kazandi", userteam.isim);
+    puan+=3;
+}
+else if(userskor4 == rakipskor4)
+{
+    printf("mac sonucu berabere\nkazanan yok!");
+    puan++;
+}
+else
+{
+    printf("maci kaybettin!");
+}
+//*************************************************************************************
+//*************************************************************************************
+//*************************************************************************************
+//*************************************************************************************
+// 5.HAFTA MAÇI
+int userskor5 = 0;
+int rakipskor5 =0;
+int devam5;
+
+
+printf("\n\n5.hafta macini oynamak icin (0) basin.");
+scanf("%d", &devam5);
+
+int userguc5 = userteam.guc + (rand() % 21 - 10);
+int rakipguc5 = fikstur[2][1].guc + (rand() % 21 - 10);
+double golbeklentisiuser5 =  userguc5 / 35.0;
+double golbeklentisi5 = rakipguc5 / 35.0;
+
+userskor5 = golhesapla(golbeklentisiuser5);
+rakipskor5 = golhesapla(golbeklentisi5);
+if(devam5 == 0);
+{
+    printf("\n\n  -mac sonucu-\n");
+    printf("%s %d %d %s\n",userteam.isim, userskor5, rakipskor5, fikstur[2][1]);
+}
+if(userskor5 > rakipskor5)
+{
+    printf("tebrikler maci %s kazandi", userteam.isim);
+    puan+=3;
+}
+else if(userskor5 == rakipskor5)
+{
+    printf("mac sonucu berabere\nkazanan yok!");
+    puan++;
+}
+else
+{
+    printf("maci kaybettin!");
+}
+//*************************************************************************************
+//*************************************************************************************
+//*************************************************************************************
+//*************************************************************************************
+// 6.HAFTA MAÇI
+int userskor6 = 0;
+int rakipskor6 =0;
+int devam6;
+
+
+printf("\n\n6.hafta macini oynamak icin (0) basin.");
+scanf("%d", &devam6);
+
+int userguc6 = userteam.guc + (rand() % 21 - 10);
+int rakipguc6 = fikstur[1][0].guc + (rand() % 21 - 10);
+double golbeklentisiuser6 =  userguc6 / 35.0;
+double golbeklentisi6 = rakipguc6 / 35.0;
+
+userskor6 = golhesapla(golbeklentisiuser6);
+rakipskor6 = golhesapla(golbeklentisi6);
+if(devam6 == 0)
+{
+    printf("\n\n  -mac sonucu-\n");
+    printf("%s %d %d %s\n",userteam.isim, userskor6, rakipskor6, fikstur[1][0]);
+}
+if(userskor6 > rakipskor6)
+{
+    printf("tebrikler maci %s kazandi", userteam.isim);
+    puan+=3;
+}
+else if(userskor6 == rakipskor6)
+{
+    printf("mac sonucu berabere\nkazanan yok!");
+    puan++;
+}
+else
+{
+    printf("maci kaybettin!");
+}
+//*************************************************************************************
+//*************************************************************************************
+//*************************************************************************************
+//*************************************************************************************
+// 7.HAFTA MAÇI
+int userskor7 = 0;
+int rakipskor7 =0;
+int devam7;
+
+
+printf("\n\n7.hafta macini oynamak icin (0) basin.");
+scanf("%d", &devam7);
+
+int userguc7 = userteam.guc + (rand() % 21 - 10);
+int rakipguc7 = fikstur[1][1].guc + (rand() % 21 - 10);
+double golbeklentisiuser7 =  userguc7 / 35.0;
+double golbeklentisi7 = rakipguc7 / 35.0;
+
+userskor7 = golhesapla(golbeklentisiuser7);
+rakipskor7 = golhesapla(golbeklentisi7);
+if(devam7 == 0)
+{
+    printf("\n\n  -mac sonucu-\n");
+    printf("%s %d %d %s\n",userteam.isim, userskor7, rakipskor7, fikstur[1][1]);
+}
+if(userskor7 > rakipskor7)
+{
+    printf("tebrikler maci %s kazandi", userteam.isim);
+    puan+=3;
+}
+else if(userskor7 == rakipskor7)
+{
+    printf("mac sonucu berabere\nkazanan yok!");
+    puan++;
+}
+else
+{
+    printf("maci kaybettin!");
+}
+//*************************************************************************************
+//*************************************************************************************
+//*************************************************************************************
+//*************************************************************************************
+// 8.HAFTA MAÇI
+int userskor8 = 0;
+int rakipskor8 =0;
+int devam8;
+
+
+printf("\n\n8.hafta macini oynamak icin (0) basin.");
+scanf("%d", &devam8);
+
+int userguc8 = userteam.guc + (rand() % 21 - 10);
+int rakipguc8 = fikstur[3][0].guc + (rand() % 21 - 10);
+double golbeklentisiuser8 =  userguc8 / 35.0;
+double golbeklentisi8 = rakipguc8 / 35.0;
+
+userskor8 = golhesapla(golbeklentisiuser8);
+rakipskor8 = golhesapla(golbeklentisi8);
+if(devam8 == 0)
+{
+    printf("\n\n  -mac sonucu-\n");
+    printf("%s %d %d %s\n",userteam.isim, userskor8, rakipskor8, fikstur[1][1]);
+}
+if(userskor8 > rakipskor8)
+{
+    printf("tebrikler maci %s kazandi", userteam.isim);
+    puan+=3;
+}
+else if(userskor8 == rakipskor8)
+{
+    printf("mac sonucu berabere\nkazanan yok!");
+    puan++;
+}
+else
+{
+    printf("maci kaybettin!");
+}
+int toplamliggol = userskor + userskor2 + userskor3 + userskor4 + userskor5 + userskor6 + userskor7 + userskor8;
+printf("\npuan durumu: %d\n", puan);
+printf("lig asamasinda atilan gol: %d\n", toplamliggol);
+//*************************************************************************************
+//*************************************************************************************
+//*************************************************************************************
+//*************************************************************************************
+//*************************************************************************************
+//*************************************************************************************
+//*************************************************************************************
+//*************************************************************************************
+// PLAYOFF / SON16
+// PLAYOFF / SON16
+
+
+if(puan < 8)
+{
+    printf("\n\nPLAYOFF'A KALAMADIN.\n");
+    printf("Toplam puanin: %d\n", puan);
+}
+else if(puan >= 8 && puan < 15)
+{
+    printf("\n\n================================\n");
+    printf("PLAYOFF TURU\n");
+    printf("================================\n");
+
+
+    /* PLAYOFF RAKIBI */
+
+    takim playoffrakip;
+
+    playoffrakip = rakipsec(allpot, &allpotize, userteam);
+
+    printf("\nPlayoff rakibin: %s\n", playoffrakip.isim);
+
+
+    /* PLAYOFF */
+
+    if(ikimactur(userteam, playoffrakip))
+    {
+        printf("\nPLAYOFF'U GECTIN!\n");
+
+
+        /* SON 16 */
+
+        printf("\n\n================================\n");
+        printf("SON 16 TURU\n");
+        printf("================================\n");
+
+        takim son16rakip;
+
+        son16rakip = rakipsec(allpot, &allpotize, userteam);
+
+        printf("\nSon 16 rakibin: %s\n", son16rakip.isim);
+
+
+        if(ikimactur(userteam, son16rakip))
+        {
+            printf("\nSON 16 TURUNU GECTIN!\n");
+
+
+            /* CEYREK FINAL */
+
+            printf("\n\n================================\n");
+            printf("CEYREK FINAL\n");
+            printf("================================\n");
+
+            takim ceyrekfinalrakip;
+
+            ceyrekfinalrakip = rakipsec(allpot, &allpotize, userteam);
+
+            printf("\nCeyrek final rakibin: %s\n",
+                   ceyrekfinalrakip.isim);
+
+
+            if(ikimactur(userteam, ceyrekfinalrakip))
+            {
+                printf("\nCEYREK FINAL'I GECTIN!\n");
+
+
+                /* YARI FINAL */
+
+                printf("\n\n================================\n");
+                printf("YARI FINAL\n");
+                printf("================================\n");
+
+                takim yarifinalrakip;
+
+                yarifinalrakip = rakipsec(allpot, &allpotize, userteam);
+
+                printf("\nYari final rakibin: %s\n",
+                       yarifinalrakip.isim);
+
+
+                if(ikimactur(userteam, yarifinalrakip))
+                {
+                    printf("\nYARI FINAL'I GECTIN!\n");
+
+
+                    /* FINAL */
+
+                    printf("\n\n================================\n");
+                    printf("FINAL\n");
+                    printf("================================\n");
+
+                    takim finalrakip;
+
+                    finalrakip = rakipsec(allpot, &allpotize, userteam);
+
+                    printf("\nFinal rakibin: %s\n",
+                           finalrakip.isim);
+
+
+                    /*
+                       FINALDE DE IKI MAC OLSUN DIYORSAN
+                       AYNI FONKSIYONU KULLANIYORUZ
+                    */
+
+                    if(ikimactur(userteam, finalrakip))
+                    {
+                        printf("\n\n================================\n");
+                        printf("ŞAMPİYONSUN!\n");
+                        printf("================================\n");
+                    }
+                    else
+                    {
+                        printf("\n\nFINALDE ELENDIN.\n");
+                    }
+                }
+                else
+                {
+                    printf("\nYARI FINALDE ELENDIN.\n");
+                }
+            }
+            else
+            {
+                printf("\nCEYREK FINALDE ELENDIN.\n");
+            }
+        }
+        else
+        {
+            printf("\nSON 16 TURUNDA ELENDIN.\n");
+        }
+    }
+    else
+    {
+        printf("\nPLAYOFF'TA ELENDIN.\n");
+    }
+}
+else
+{
+    printf("\n\n================================\n");
+    printf("SON 16 TURU\n");
+    printf("================================\n");
+
+
+    takim son16rakip;
+
+    son16rakip = rakipsec(allpot, &allpotize, userteam);
+
+    printf("\nSon 16 rakibin: %s\n", son16rakip.isim);
+
+
+    if(ikimactur(userteam, son16rakip))
+    {
+        printf("\nSON 16 TURUNU GECTIN!\n");
+
+
+        /* CEYREK FINAL */
+
+        takim ceyrekfinalrakip;
+
+        printf("\n\n================================\n");
+        printf("CEYREK FINAL\n");
+        printf("================================\n");
+
+        ceyrekfinalrakip = rakipsec(allpot, &allpotize, userteam);
+
+        printf("\nCeyrek final rakibin: %s\n",
+               ceyrekfinalrakip.isim);
+
+
+        if(ikimactur(userteam, ceyrekfinalrakip))
+        {
+            printf("\nCEYREK FINAL'I GECTIN!\n");
+
+
+            /* YARI FINAL */
+
+            takim yarifinalrakip;
+
+            printf("\n\n================================\n");
+            printf("YARI FINAL\n");
+            printf("================================\n");
+
+            yarifinalrakip = rakipsec(allpot, &allpotize, userteam);
+
+            printf("\nYari final rakibin: %s\n",
+                   yarifinalrakip.isim);
+
+
+            if(ikimactur(userteam, yarifinalrakip))
+            {
+                printf("\nYARI FINAL'I GECTIN!\n");
+
+
+                /* FINAL */
+
+                takim finalrakip;
+
+                printf("\n\n================================\n");
+                printf("FINAL\n");
+                printf("================================\n");
+
+                finalrakip = rakipsec(allpot, &allpotize, userteam);
+
+                printf("\nFinal rakibin: %s\n",
+                       finalrakip.isim);
+
+
+                if(ikimactur(userteam, finalrakip))
+                {
+                    printf("\n\n================================\n");
+                    printf("ŞAMPİYONSUN!\n");
+                    printf("================================\n");
+                }
+                else
+                {
+                    printf("\nFINALDE ELENDIN.\n");
+                }
+            }
+            else
+            {
+                printf("\nYARI FINALDE ELENDIN.\n");
+            }
+        }
+        else
+        {
+            printf("\nCEYREK FINALDE ELENDIN.\n");
+        }
+    }
+    else
+    {
+        printf("\nSON 16 TURUNDA ELENDIN.\n");
+    }
+}
+}else if(potselect == 4)
+{
+    int pot4size = sizeof(pot4)/sizeof(pot4[0]);
+    for(int i = 0; i<potsize;i++)
+    {
+        printf("[%d]%s\n",i+1, pot4[i].team.isim);
+    }
+printf("secmek istediginiz takimin numarasini girin [1-9]\n");
+printf("num: ");
+scanf("%d", &teamselect);
+
+userteam = pot4[teamselect-1].team; // userteam
+
+for(int i = teamselect-1; i<pot4size-1;i++)
+{
+     pot4[i] = pot4[i+1];
+}
+pot4size--;
+//*************************************************************************************
+//POT1.1 RANDOM
+int secilen1;
+int secilen2;
+takim secilenrakip1;
+takim secilenrakip2;
+do
+{
+    secilen1 = rand() % pot4size;
+      secilenrakip1 = pot4[secilen1].team;
+
+}while(strcmp(userteam.ulke, secilenrakip1.ulke) == 0);
+
+for(int i = secilen1; i<pot4size-1;i++)
+{
+    pot4[i] = pot4[i+1];
+}
+pot4size--;
+
+do
+{
+    secilen2 = rand() % pot4size;
+    secilenrakip2 = pot4[secilen2].team;
+}while(strcmp(userteam.ulke, secilenrakip2.ulke) == 0);
+for(int i = secilen2; i<pot4size-1;i++)
+{
+    pot4[i] = pot4[i+1];
+}
+pot4size--;
+
+takim pot4kalanlar[6];
+for(int i = 0; i<6; i++)
+{
+    pot4kalanlar[i] = pot4[i].team;
+}
+//*************************************************************************************
+//  POT1.2 RANDOM
+int pot1size = sizeof(pot1) / sizeof(pot1[0]);
+int secilen3;
+int secilen4;
+takim secilenrakip3;
+takim secilenrakip4;
+do
+{
+    secilen3 = rand() % pot1size;
+      secilenrakip3 = pot1[secilen3].team;
+
+}while(strcmp(userteam.ulke, secilenrakip3.ulke) == 0);
+
+for(int i = secilen3; i<pot1size-1;i++)
+{
+    pot1[i] = pot1[i+1];
+}
+pot1size--;
+
+do
+{
+    secilen4 = rand() % pot1size;
+    secilenrakip4 = pot1[secilen4].team;
+}while(strcmp(userteam.ulke, secilenrakip4.ulke) == 0);
+for(int i = secilen4; i<pot1size-1;i++)
+{
+    pot1[i] = pot1[i+1];
+}
+pot1size--;
+
+takim pot1kalanlar[6];
+for(int i = 0; i<6; i++)
+{
+    pot1kalanlar[i] = pot1[i].team;
+}
+//*************************************************************************************
+//  POT1.3 RANDOM
+int pot2size = sizeof(pot2) / sizeof(pot2[0]);
+int secilen5;
+int secilen6;
+takim secilenrakip5;
+takim secilenrakip6;
+do
+{
+    secilen5 = rand() % pot2size;
+      secilenrakip5 = pot2[secilen5].team;
+
+}while(strcmp(userteam.ulke, secilenrakip5.ulke) == 0);
+
+for(int i = secilen5; i<pot2size-1;i++)
+{
+    pot2[i] = pot2[i+1];
+}
+pot2size--;
+
+do
+{
+    secilen6 = rand() % pot2size;
+    secilenrakip6 = pot2[secilen6].team;
+}while(strcmp(userteam.ulke, secilenrakip6.ulke) == 0);
+for(int i = secilen6; i<pot2size-1;i++)
+{
+    pot2[i] = pot2[i+1];
+}
+pot2size--;
+
+takim pot2kalanlar[6];
+for(int i = 0; i<6; i++)
+{
+    pot2kalanlar[i] = pot2[i].team;
+}
+//*************************************************************************************
+//  POT1.4 RANDOM
+int pot3size = sizeof(pot3) / sizeof(pot3[0]);
+int secilen7;
+int secilen8;
+takim secilenrakip7;
+takim secilenrakip8;
+do
+{
+    secilen7 = rand() % pot3size;
+      secilenrakip7 = pot3[secilen7].team;
+
+}while(strcmp(userteam.ulke, secilenrakip7.ulke) == 0);
+
+for(int i = secilen7; i<pot3size-1;i++)
+{
+    pot3[i] = pot3[i+1];
+}
+pot3size--;
+
+do
+{
+    secilen8 = rand() % pot3size;
+    secilenrakip8 = pot3[secilen8].team;
+}while(strcmp(userteam.ulke, secilenrakip8.ulke) == 0);
+for(int i = secilen8; i<pot3size-1;i++)
+{
+    pot3[i] = pot3[i+1];
+}
+pot3size--;
+
+takim pot3kalanlar[6];
+for(int i = 0; i<6; i++)
+{
+    pot3kalanlar[i] = pot3[i].team;
+}
+//*************************************************************************************
+//  İLK 8 HOME AWAY
+
+takim fikstur[4][2] = 
+{ 
+{secilenrakip1, secilenrakip2},
+{secilenrakip3, secilenrakip4},
+{secilenrakip5, secilenrakip6},
+{secilenrakip7, secilenrakip8},
+};
+printf("\n\ntakiminiz: %s\n", userteam.isim);
+printf("HOME                   AWAY\n");
+for(int i = 0; i<4; i++)
+{
+    printf("%-20s %-20s\n", fikstur[i][1].isim, fikstur[i][0].isim);
+}
+printf("\n");
+//*************************************************************************************
+//  İLK 8 FİKSTÜR
+printf("[1]%s[H]\n[2]%s[A]\n[3]%s[H]\n[4]%s[A]\n[5]%s[H]\n[6]%s[A]\n[7]%s[H]\n[8]%s[A]\n",fikstur[0][1].isim,fikstur[2][0].isim,fikstur[3][1].isim,fikstur[0][0].isim,fikstur[2][1].isim,fikstur[1][0].isim,fikstur[1][1].isim,fikstur[3][0].isim);
+//*************************************************************************************
+//*************************************************************************************
+//*************************************************************************************
+//*************************************************************************************
+// 1.HAFTA MAÇI
+int userskor = 0;
+int rakipskor =0;
+int devam;
+int puan = 0;
+
+printf("\n1.hafta macini oynamak icin (0) basin.");
+scanf("%d", &devam);
+
+int userguc1 = userteam.guc + (rand() % 21 - 10);
+int rakipguc1 = fikstur[0][1].guc + (rand() % 21 - 10);
+double golbeklentisiuser1 =  userguc1 / 35.0;
+double golbeklentisi1 = rakipguc1 / 35.0;
+
+userskor = golhesapla(golbeklentisiuser1);
+rakipskor = golhesapla(golbeklentisi1);
+if(devam == 0)
+{
+    printf("\n\n  -mac sonucu-\n");
+    printf("%s %d %d %s\n",userteam.isim, userskor, rakipskor, fikstur[0][1]);
+}
+if(userskor > rakipskor)
+{
+    printf("tebrikler maci %s kazandi", userteam.isim);
+    puan+=3;
+}
+else if(userskor == rakipskor)
+{
+    printf("mac sonucu berabere\nkazanan yok!");
+    puan++;
+}
+else
+{
+    printf("maci kaybettin!");
+}
+//*************************************************************************************
+//*************************************************************************************
+//*************************************************************************************
+//*************************************************************************************
+// 2.HAFTA MAÇI
+int userskor2 = 0;
+int rakipskor2 =0;
+int devam2;
+
+
+printf("\n\n2.hafta macini oynamak icin (0) basin.");
+scanf("%d", &devam2);
+
+int userguc2 = userteam.guc + (rand() % 21 - 10);
+int rakipguc2 = fikstur[2][0].guc + (rand() % 21 - 10);
+double golbeklentisiuser2 =  userguc2 / 35.0;
+double golbeklentisi2 = rakipguc2 / 35.0;
+
+userskor2 = golhesapla(golbeklentisiuser2);
+rakipskor2 = golhesapla(golbeklentisi2);
+if(devam2 == 0)
+{
+    printf("\n\n  -mac sonucu-\n");
+    printf("%s %d %d %s\n",userteam.isim, userskor2, rakipskor2, fikstur[2][0]);
+}
+if(userskor2 > rakipskor2)
+{
+    printf("tebrikler maci %s kazandi", userteam.isim);
+    puan+=3;
+}
+else if(userskor2 == rakipskor2)
+{
+    printf("mac sonucu berabere\nkazanan yok!");
+    puan++;
+}
+else
+{
+    printf("maci kaybettin!");
+}
+//*************************************************************************************
+//*************************************************************************************
+//*************************************************************************************
+//*************************************************************************************
+// 3.HAFTA MAÇI
+int userskor3 = 0;
+int rakipskor3 =0;
+int devam3;
+
+
+printf("\n\n3.hafta macini oynamak icin (0) basin.");
+scanf("%d", &devam3);
+
+int userguc3 = userteam.guc + (rand() % 21 - 10);
+int rakipguc3 = fikstur[3][1].guc + (rand() % 21 - 10);
+double golbeklentisiuser3 =  userguc3 / 35.0;
+double golbeklentisi3 = rakipguc3 / 35.0;
+
+userskor3 = golhesapla(golbeklentisiuser3);
+rakipskor3 = golhesapla(golbeklentisi3);
+if(devam3 == 0);
+{
+    printf("\n\n  -mac sonucu-\n");
+    printf("%s %d %d %s\n",userteam.isim, userskor3, rakipskor3, fikstur[3][1]);
+}
+if(userskor3 > rakipskor3)
+{
+    printf("tebrikler maci %s kazandi", userteam.isim);
+    puan+=3;
+}
+else if(userskor3 == rakipskor3)
+{
+    printf("mac sonucu berabere\nkazanan yok!");
+    puan++;
+}
+else
+{
+    printf("maci kaybettin!");
+}
+//*************************************************************************************
+//*************************************************************************************
+//*************************************************************************************
+//*************************************************************************************
+// 4.HAFTA MAÇI
+int userskor4 = 0;
+int rakipskor4 =0;
+int devam4;
+
+
+printf("\n\n4.hafta macini oynamak icin (0) basin.");
+scanf("%d", &devam4);
+
+int userguc4 = userteam.guc + (rand() % 21 - 10);
+int rakipguc4 = fikstur[0][0].guc + (rand() % 21 - 10);
+double golbeklentisiuser4 =  userguc4 / 35.0;
+double golbeklentisi4 = rakipguc4 / 35.0;
+
+userskor4 = golhesapla(golbeklentisiuser4);
+rakipskor4 = golhesapla(golbeklentisi4);
+if(devam4 == 0)
+{
+    printf("\n\n  -mac sonucu-\n");
+    printf("%s %d %d %s\n",userteam.isim, userskor4, rakipskor4, fikstur[0][0]);
+}
+if(userskor4 > rakipskor4)
+{
+    printf("tebrikler maci %s kazandi", userteam.isim);
+    puan+=3;
+}
+else if(userskor4 == rakipskor4)
+{
+    printf("mac sonucu berabere\nkazanan yok!");
+    puan++;
+}
+else
+{
+    printf("maci kaybettin!");
+}
+//*************************************************************************************
+//*************************************************************************************
+//*************************************************************************************
+//*************************************************************************************
+// 5.HAFTA MAÇI
+int userskor5 = 0;
+int rakipskor5 =0;
+int devam5;
+
+
+printf("\n\n5.hafta macini oynamak icin (0) basin.");
+scanf("%d", &devam5);
+
+int userguc5 = userteam.guc + (rand() % 21 - 10);
+int rakipguc5 = fikstur[2][1].guc + (rand() % 21 - 10);
+double golbeklentisiuser5 =  userguc5 / 35.0;
+double golbeklentisi5 = rakipguc5 / 35.0;
+
+userskor5 = golhesapla(golbeklentisiuser5);
+rakipskor5 = golhesapla(golbeklentisi5);
+if(devam5 == 0);
+{
+    printf("\n\n  -mac sonucu-\n");
+    printf("%s %d %d %s\n",userteam.isim, userskor5, rakipskor5, fikstur[2][1]);
+}
+if(userskor5 > rakipskor5)
+{
+    printf("tebrikler maci %s kazandi", userteam.isim);
+    puan+=3;
+}
+else if(userskor5 == rakipskor5)
+{
+    printf("mac sonucu berabere\nkazanan yok!");
+    puan++;
+}
+else
+{
+    printf("maci kaybettin!");
+}
+//*************************************************************************************
+//*************************************************************************************
+//*************************************************************************************
+//*************************************************************************************
+// 6.HAFTA MAÇI
+int userskor6 = 0;
+int rakipskor6 =0;
+int devam6;
+
+
+printf("\n\n6.hafta macini oynamak icin (0) basin.");
+scanf("%d", &devam6);
+
+int userguc6 = userteam.guc + (rand() % 21 - 10);
+int rakipguc6 = fikstur[1][0].guc + (rand() % 21 - 10);
+double golbeklentisiuser6 =  userguc6 / 35.0;
+double golbeklentisi6 = rakipguc6 / 35.0;
+
+userskor6 = golhesapla(golbeklentisiuser6);
+rakipskor6 = golhesapla(golbeklentisi6);
+if(devam6 == 0)
+{
+    printf("\n\n  -mac sonucu-\n");
+    printf("%s %d %d %s\n",userteam.isim, userskor6, rakipskor6, fikstur[1][0]);
+}
+if(userskor6 > rakipskor6)
+{
+    printf("tebrikler maci %s kazandi", userteam.isim);
+    puan+=3;
+}
+else if(userskor6 == rakipskor6)
+{
+    printf("mac sonucu berabere\nkazanan yok!");
+    puan++;
+}
+else
+{
+    printf("maci kaybettin!");
+}
+//*************************************************************************************
+//*************************************************************************************
+//*************************************************************************************
+//*************************************************************************************
+// 7.HAFTA MAÇI
+int userskor7 = 0;
+int rakipskor7 =0;
+int devam7;
+
+
+printf("\n\n7.hafta macini oynamak icin (0) basin.");
+scanf("%d", &devam7);
+
+int userguc7 = userteam.guc + (rand() % 21 - 10);
+int rakipguc7 = fikstur[1][1].guc + (rand() % 21 - 10);
+double golbeklentisiuser7 =  userguc7 / 35.0;
+double golbeklentisi7 = rakipguc7 / 35.0;
+
+userskor7 = golhesapla(golbeklentisiuser7);
+rakipskor7 = golhesapla(golbeklentisi7);
+if(devam7 == 0)
+{
+    printf("\n\n  -mac sonucu-\n");
+    printf("%s %d %d %s\n",userteam.isim, userskor7, rakipskor7, fikstur[1][1]);
+}
+if(userskor7 > rakipskor7)
+{
+    printf("tebrikler maci %s kazandi", userteam.isim);
+    puan+=3;
+}
+else if(userskor7 == rakipskor7)
+{
+    printf("mac sonucu berabere\nkazanan yok!");
+    puan++;
+}
+else
+{
+    printf("maci kaybettin!");
+}
+//*************************************************************************************
+//*************************************************************************************
+//*************************************************************************************
+//*************************************************************************************
+// 8.HAFTA MAÇI
+int userskor8 = 0;
+int rakipskor8 =0;
+int devam8;
+
+
+printf("\n\n8.hafta macini oynamak icin (0) basin.");
+scanf("%d", &devam8);
+
+int userguc8 = userteam.guc + (rand() % 21 - 10);
+int rakipguc8 = fikstur[3][0].guc + (rand() % 21 - 10);
+double golbeklentisiuser8 =  userguc8 / 35.0;
+double golbeklentisi8 = rakipguc8 / 35.0;
+
+userskor8 = golhesapla(golbeklentisiuser8);
+rakipskor8 = golhesapla(golbeklentisi8);
+if(devam8 == 0)
+{
+    printf("\n\n  -mac sonucu-\n");
+    printf("%s %d %d %s\n",userteam.isim, userskor8, rakipskor8, fikstur[1][1]);
+}
+if(userskor8 > rakipskor8)
+{
+    printf("tebrikler maci %s kazandi", userteam.isim);
+    puan+=3;
+}
+else if(userskor8 == rakipskor8)
+{
+    printf("mac sonucu berabere\nkazanan yok!");
+    puan++;
+}
+else
+{
+    printf("maci kaybettin!");
+}
+int toplamliggol = userskor + userskor2 + userskor3 + userskor4 + userskor5 + userskor6 + userskor7 + userskor8;
+printf("\npuan durumu: %d\n", puan);
+printf("lig asamasinda atilan gol: %d\n", toplamliggol);
+//*************************************************************************************
+//*************************************************************************************
+//*************************************************************************************
+//*************************************************************************************
+//*************************************************************************************
+//*************************************************************************************
+//*************************************************************************************
+//*************************************************************************************
+// PLAYOFF / SON16
+// PLAYOFF / SON16
+
+
+if(puan < 8)
+{
+    printf("\n\nPLAYOFF'A KALAMADIN.\n");
+    printf("Toplam puanin: %d\n", puan);
+}
+else if(puan >= 8 && puan < 15)
+{
+    printf("\n\n================================\n");
+    printf("PLAYOFF TURU\n");
+    printf("================================\n");
+
+
+    /* PLAYOFF RAKIBI */
+
+    takim playoffrakip;
+
+    playoffrakip = rakipsec(allpot, &allpotize, userteam);
+
+    printf("\nPlayoff rakibin: %s\n", playoffrakip.isim);
+
+
+    /* PLAYOFF */
+
+    if(ikimactur(userteam, playoffrakip))
+    {
+        printf("\nPLAYOFF'U GECTIN!\n");
+
+
+        /* SON 16 */
+
+        printf("\n\n================================\n");
+        printf("SON 16 TURU\n");
+        printf("================================\n");
+
+        takim son16rakip;
+
+        son16rakip = rakipsec(allpot, &allpotize, userteam);
+
+        printf("\nSon 16 rakibin: %s\n", son16rakip.isim);
+
+
+        if(ikimactur(userteam, son16rakip))
+        {
+            printf("\nSON 16 TURUNU GECTIN!\n");
+
+
+            /* CEYREK FINAL */
+
+            printf("\n\n================================\n");
+            printf("CEYREK FINAL\n");
+            printf("================================\n");
+
+            takim ceyrekfinalrakip;
+
+            ceyrekfinalrakip = rakipsec(allpot, &allpotize, userteam);
+
+            printf("\nCeyrek final rakibin: %s\n",
+                   ceyrekfinalrakip.isim);
+
+
+            if(ikimactur(userteam, ceyrekfinalrakip))
+            {
+                printf("\nCEYREK FINAL'I GECTIN!\n");
+
+
+                /* YARI FINAL */
+
+                printf("\n\n================================\n");
+                printf("YARI FINAL\n");
+                printf("================================\n");
+
+                takim yarifinalrakip;
+
+                yarifinalrakip = rakipsec(allpot, &allpotize, userteam);
+
+                printf("\nYari final rakibin: %s\n",
+                       yarifinalrakip.isim);
+
+
+                if(ikimactur(userteam, yarifinalrakip))
+                {
+                    printf("\nYARI FINAL'I GECTIN!\n");
+
+
+                    /* FINAL */
+
+                    printf("\n\n================================\n");
+                    printf("FINAL\n");
+                    printf("================================\n");
+
+                    takim finalrakip;
+
+                    finalrakip = rakipsec(allpot, &allpotize, userteam);
+
+                    printf("\nFinal rakibin: %s\n",
+                           finalrakip.isim);
+
+
+                    /*
+                       FINALDE DE IKI MAC OLSUN DIYORSAN
+                       AYNI FONKSIYONU KULLANIYORUZ
+                    */
+
+                    if(ikimactur(userteam, finalrakip))
+                    {
+                        printf("\n\n================================\n");
+                        printf("ŞAMPİYONSUN!\n");
+                        printf("================================\n");
+                    }
+                    else
+                    {
+                        printf("\n\nFINALDE ELENDIN.\n");
+                    }
+                }
+                else
+                {
+                    printf("\nYARI FINALDE ELENDIN.\n");
+                }
+            }
+            else
+            {
+                printf("\nCEYREK FINALDE ELENDIN.\n");
+            }
+        }
+        else
+        {
+            printf("\nSON 16 TURUNDA ELENDIN.\n");
+        }
+    }
+    else
+    {
+        printf("\nPLAYOFF'TA ELENDIN.\n");
+    }
+}
+else
+{
+    printf("\n\n================================\n");
+    printf("SON 16 TURU\n");
+    printf("================================\n");
+
+
+    takim son16rakip;
+
+    son16rakip = rakipsec(allpot, &allpotize, userteam);
+
+    printf("\nSon 16 rakibin: %s\n", son16rakip.isim);
+
+
+    if(ikimactur(userteam, son16rakip))
+    {
+        printf("\nSON 16 TURUNU GECTIN!\n");
+
+
+        /* CEYREK FINAL */
+
+        takim ceyrekfinalrakip;
+
+        printf("\n\n================================\n");
+        printf("CEYREK FINAL\n");
+        printf("================================\n");
+
+        ceyrekfinalrakip = rakipsec(allpot, &allpotize, userteam);
+
+        printf("\nCeyrek final rakibin: %s\n",
+               ceyrekfinalrakip.isim);
+
+
+        if(ikimactur(userteam, ceyrekfinalrakip))
+        {
+            printf("\nCEYREK FINAL'I GECTIN!\n");
+
+
+            /* YARI FINAL */
+
+            takim yarifinalrakip;
+
+            printf("\n\n================================\n");
+            printf("YARI FINAL\n");
+            printf("================================\n");
+
+            yarifinalrakip = rakipsec(allpot, &allpotize, userteam);
+
+            printf("\nYari final rakibin: %s\n",
+                   yarifinalrakip.isim);
+
+
+            if(ikimactur(userteam, yarifinalrakip))
+            {
+                printf("\nYARI FINAL'I GECTIN!\n");
+
+
+                /* FINAL */
+
+                takim finalrakip;
+
+                printf("\n\n================================\n");
+                printf("FINAL\n");
+                printf("================================\n");
+
+                finalrakip = rakipsec(allpot, &allpotize, userteam);
+
+                printf("\nFinal rakibin: %s\n",
+                       finalrakip.isim);
+
+
+                if(ikimactur(userteam, finalrakip))
+                {
+                    printf("\n\n================================\n");
+                    printf("ŞAMPİYONSUN!\n");
+                    printf("================================\n");
+                }
+                else
+                {
+                    printf("\nFINALDE ELENDIN.\n");
+                }
+            }
+            else
+            {
+                printf("\nYARI FINALDE ELENDIN.\n");
+            }
+        }
+        else
+        {
+            printf("\nCEYREK FINALDE ELENDIN.\n");
+        }
+    }
+    else
+    {
+        printf("\nSON 16 TURUNDA ELENDIN.\n");
+    }
+}
+}
+
+
+
+
+return 0;}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
