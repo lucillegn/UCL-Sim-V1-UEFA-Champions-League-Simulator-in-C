@@ -49,7 +49,7 @@ int penalti(takim atan)
 
     if(secim == kaleciy)
     {
-        printf("Kaleci doğru köseye atladi!\n");
+        printf("Kaleci doğru koseye atladi!\n");
         printf("PENALTI KACTI!\n");
         return 0;
     }
@@ -77,7 +77,7 @@ int rakippenalti(takim rakip)
 
     if(secim == rakipvurus)
     {
-        printf("KALECİ KURTARDI!\n");
+        printf("KALECI KURTARDI!\n");
         return 0;
     }
     else
@@ -960,15 +960,14 @@ else if(puan >= 8 && puan < 15)
                            finalrakip.isim);
 
 
-                    /*
-                       FINALDE DE IKI MAC OLSUN DIYORSAN
-                       AYNI FONKSIYONU KULLANIYORUZ
-                    */
+                    
+                       
+                    
 
                     if(ikimactur(userteam, finalrakip))
                     {
                         printf("\n\n================================\n");
-                        printf("ŞAMPİYONSUN!\n");
+                        printf("SAMPIYONSUN!\n");
                         printf("================================\n");
                     }
                     else
@@ -1070,7 +1069,7 @@ else
                 if(ikimactur(userteam, finalrakip))
                 {
                     printf("\n\n================================\n");
-                    printf("ŞAMPİYONSUN!\n");
+                    printf("SAMPIYONSUN!\n");
                     printf("================================\n");
                 }
                 else
@@ -1711,7 +1710,7 @@ else if(puan >= 8 && puan < 15)
                     if(ikimactur(userteam, finalrakip))
                     {
                         printf("\n\n================================\n");
-                        printf("ŞAMPİYONSUN!\n");
+                        printf("SAMPIYONSUN!\n");
                         printf("================================\n");
                     }
                     else
@@ -1813,7 +1812,7 @@ else
                 if(ikimactur(userteam, finalrakip))
                 {
                     printf("\n\n================================\n");
-                    printf("ŞAMPİYONSUN!\n");
+                    printf("SAMPIYONSUN!\n");
                     printf("================================\n");
                 }
                 else
@@ -2442,15 +2441,14 @@ else if(puan >= 8 && puan < 15)
                            finalrakip.isim);
 
 
-                    /*
-                       FINALDE DE IKI MAC OLSUN DIYORSAN
-                       AYNI FONKSIYONU KULLANIYORUZ
-                    */
+                    
+                
+                    
 
                     if(ikimactur(userteam, finalrakip))
                     {
                         printf("\n\n================================\n");
-                        printf("ŞAMPİYONSUN!\n");
+                        printf("SAMPIYONSUN!\n");
                         printf("================================\n");
                     }
                     else
@@ -2552,7 +2550,7 @@ else
                 if(ikimactur(userteam, finalrakip))
                 {
                     printf("\n\n================================\n");
-                    printf("ŞAMPİYONSUN!\n");
+                    printf("SAMPIYONSUN!\n");
                     printf("================================\n");
                 }
                 else
@@ -3181,15 +3179,12 @@ else if(puan >= 8 && puan < 15)
                            finalrakip.isim);
 
 
-                    /*
-                       FINALDE DE IKI MAC OLSUN DIYORSAN
-                       AYNI FONKSIYONU KULLANIYORUZ
-                    */
+                   
 
                     if(ikimactur(userteam, finalrakip))
                     {
                         printf("\n\n================================\n");
-                        printf("ŞAMPİYONSUN!\n");
+                        printf("SAMPIYONSUN!\n");
                         printf("================================\n");
                     }
                     else
@@ -3291,7 +3286,7 @@ else
                 if(ikimactur(userteam, finalrakip))
                 {
                     printf("\n\n================================\n");
-                    printf("ŞAMPİYONSUN!\n");
+                    printf("SAMPIYONSUN!\n");
                     printf("================================\n");
                 }
                 else
@@ -3320,7 +3315,6 @@ else
 
 
 return 0;}
-
 
 
 
